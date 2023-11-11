@@ -20,5 +20,9 @@ namespace Learning.Models
 
         public DbSet<Backend.Models.Pool> Pool { get; set; }
 
+        public DbSet<Backend.Models.Routes> Routes { get; set; }
+
+        public DbSet<Backend.Models.RouteOrder> RouteOrder { get; set; }
+
     }
 }
