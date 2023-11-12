@@ -44,6 +44,21 @@ namespace Backend.Controllers
             return pool;
         }
 
+        // GET: api/Pools/5
+        //[HttpGet("GetDriverPools")]
+        //public async Task<ActionResult<IEnumerable<Pool>>> GetDriverPools(int id)
+        //{
+        //    var temp = _context.Pool
+        //       .Where(x => x.HostId == id).ToListAsync();
+
+        //    if (temp == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return temp;
+        //}
+
         // PUT: api/Pools/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
