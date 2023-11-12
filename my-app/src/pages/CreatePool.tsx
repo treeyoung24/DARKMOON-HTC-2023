@@ -34,7 +34,7 @@ export function CreatePool() {
             //     console.log("Success")
             // })
 
-            postPool(ENDPOINTS.pool, dto).then((res) => {
+            postPool(dto).then((res) => {
                 console.log(res);
                 console.log("Success");
                 navigate(`/manage-pool/${res.data.poolId}`, { replace: true });
