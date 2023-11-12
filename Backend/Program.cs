@@ -1,9 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
 using Learning.Models;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+
 var root = Directory.GetCurrentDirectory();
 var dotenv = Path.Combine(root, ".env");
-DotEnv.Load(dotenv);
+YourApplication.DotEnv.Load(dotenv);
+// Console.WriteLine("API KEY = {0}", Environment.GetEnvironmentVariable("API_KEY"));
+
 builder.Services.AddControllers().AddNewtonsoftJson();
 builder.Services.AddDbContext<GeneralContext>(options => options.UseSqlite("Data Source=Database.db"));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
