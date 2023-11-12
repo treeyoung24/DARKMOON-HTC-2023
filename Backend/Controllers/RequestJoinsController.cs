@@ -106,6 +106,9 @@ namespace Backend.Controllers
             _context.RequestJoin.Remove(temp);
             await _context.SaveChangesAsync();
 
+            // Update route in pool
+            UpdatePool(requestJoin);
+
             return NoContent();
         }
 
@@ -156,6 +159,24 @@ namespace Backend.Controllers
             };
 
             return passenger;
+        }
+
+        private async void UpdatePool(RequestJoin request)
+        {
+            //int id = request.PoolId;
+            Pool pool = await _context.Pool.FindAsync(request.PoolId);
+
+            pool.RouteId = request.RouteId;
+
+            _context.Entry(pool).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();  
+
+        }
+
+        private bool PoolExists(int id)
+        {
+            return _context.Pool.Any(e => e.PoolId == id);
         }
     }
 }

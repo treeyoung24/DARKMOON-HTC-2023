@@ -7,5 +7,6 @@
         public int PoolSize { get; set; }
         public string ArrivalTime { get; set; }
         public string Destination { get; set;}
+        public int RouteId { get; set; }
     }
 }

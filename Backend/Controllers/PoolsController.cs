@@ -170,6 +170,7 @@ namespace Backend.Controllers
             obj.ArrivalTime = dto.ArrivalTime;
             obj.Destination = dto.Destination;
             obj.HostId = dto.HostId;
+            obj.RouteId = 0;
 
             Driver dr = new Driver
             {
