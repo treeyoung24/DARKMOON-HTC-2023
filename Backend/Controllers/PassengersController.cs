@@ -102,7 +102,7 @@ namespace Backend.Controllers
             _context.Passenger.Remove(temp);
             await _context.SaveChangesAsync();
 
-            //UpdatePool(dto.PoolId);
+            UpdatePool(dto.PoolId);
 
             return NoContent();
         }

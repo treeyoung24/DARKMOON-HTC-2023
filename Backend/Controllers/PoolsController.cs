@@ -150,6 +150,7 @@ namespace Backend.Controllers
             await _context.SaveChangesAsync();
             
             // Add pool
+            obj.RouteId = newRoute.RouteId;
             _context.Pool.Add(obj);
             await _context.SaveChangesAsync();
 
