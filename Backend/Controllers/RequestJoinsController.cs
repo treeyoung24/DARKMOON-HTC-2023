@@ -44,6 +44,20 @@ namespace Backend.Controllers
             return requestJoin;
         }
 
+        // GET: api/RequestJoins/5
+        [HttpGet("GetAllPendingRequest")]
+        public async Task<ActionResult<IEnumerable<RequestJoin>>> GetAllPendingRequest(int id)
+        {
+            var temp = await _context.RequestJoin
+               .Where(x => x.PoolId == id).ToListAsync();
+            if (temp == null)
+            {
+                return NotFound();
+            }
+
+            return temp;
+        }
+
         // PUT: api/RequestJoins/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
