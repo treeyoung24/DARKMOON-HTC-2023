@@ -1,7 +1,7 @@
 import { PoolDTO } from "../dtos/pool.dto";
 
 
-const rootUrl = 'http://localhost:7113/api';
+const rootUrl = 'https://localhost:7113/api';
 
 export async function postPool(pool: PoolDTO): Promise<PoolDTO>{
 

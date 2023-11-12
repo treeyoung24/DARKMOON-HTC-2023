@@ -185,7 +185,7 @@ namespace Backend.Controllers
             httpRequest.Headers.Add("X-Goog-FieldMask",
                 "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline,routes.legs.duration");
             var response = await client.SendAsync(httpRequest);
-
+            Console.WriteLine(await response.Content.ReadAsStringAsync());
             //create route from request
             Random random = new Random();
             // Generate a random 8-digit number

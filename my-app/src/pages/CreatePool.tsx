@@ -11,11 +11,10 @@ import { postPool } from "../api/services/pool.service";
 export function CreatePool() {
     useEffect(() => {
             const dto:PoolDTO = {
-                HostId: 1,
-                StartPoint: "123",
-                PoolSize: 1,
-                Destination: "123",
-                ArrivalTime: "11:00",
+                hostId: 1,
+                poolSize: 1,
+                destination: "588 Aero Dr NE #106, Calgary, AB T2E 7Y4",
+                arrivalTime: "2023-11-15T15:01:23.045123456Z",
             }
 
             postPool(dto).then((res) => {
