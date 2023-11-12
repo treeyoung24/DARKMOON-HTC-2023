@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
 using Learning.Models;
+using Backend.Models.DTO;
+using Humanizer;
 
 namespace Backend.Controllers
 {
@@ -73,28 +75,69 @@ namespace Backend.Controllers
             return NoContent();
         }
 
-        // POST: api/Pools
+        // POST: api/Pools  
+        // CREATE POOL BY DRIVER
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Pool>> PostPool(Pool pool)
+        public async Task<ActionResult<Pool>> PostPool(PoolDTO dto)
         {
-            _context.Pool.Add(pool);
+            (Pool obj, Driver dr) = dtoToPool(dto);
+
+            // Add pool
+            _context.Pool.Add(obj);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPool", new { id = pool.PoolId }, pool);
+            // Add driver
+            _context.Driver.Add(dr);
+            await _context.SaveChangesAsync();
+
+            // Generate Route
+
+            return CreatedAtAction("GetPool", new { id = obj.PoolId }, obj);
         }
 
+
         // DELETE: api/Pools/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePool(int id)
+        [HttpDelete("Delete")]
+        public async Task<IActionResult> DeletePool(DriverDTO dto)
         {
-            var pool = await _context.Pool.FindAsync(id);
-            if (pool == null)
+            var temp = _context.Pool
+               .Where(x => x.PoolId == dto.PoolID
+               && x.HostId == dto.DriverID).FirstOrDefault();
+            
+            
+            if (temp == null)
             {
                 return NotFound();
             }
 
+            var driver = await _context.Driver.FindAsync(dto.PoolID);
+            _context.Pool.Remove(temp);
+            _context.Driver.Remove(driver);
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        // DELETE: api/Pools/5
+        [HttpDelete("Out")]
+        public async Task<IActionResult> DeletePool(PassengerDTO dto)
+        {
+            var temp = _context.Passenger
+               .Where(x => x.PoolId == dto.PoolId   
+               && x.PassengerId == dto.PassengerId).FirstOrDefault();
+
+
+            if (temp == null)
+            {
+                return NotFound();
+            }
+
+            var pool = await _context.Pool.FindAsync(dto.PoolId);
             _context.Pool.Remove(pool);
+            _context.Passenger.Remove(temp);
+
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -104,5 +147,43 @@ namespace Backend.Controllers
         {
             return _context.Pool.Any(e => e.PoolId == id);
         }
+
+
+        [NonAction]
+        public int GenerateRandomPoolId()
+        {
+            Random random = new Random();
+
+            // Generate a random 8-digit number
+            int poolId = random.Next(10000000, 99999999);
+
+            return poolId;
+        }
+
+        private (Pool, Driver) dtoToPool(PoolDTO dto)
+        {
+            Pool obj = new Pool();
+
+            int rand = GenerateRandomPoolId();
+            obj.PoolId = rand;
+            obj.PoolSize = dto.PoolSize;
+            obj.ArrivalTime = dto.ArrivalTime;
+            obj.Destination = dto.Destination;
+            obj.HostId = dto.HostId;
+
+            Driver dr = new Driver
+            {
+                DriverId = dto.HostId,
+                StartTime = "0",  // TODO
+                PoolId = rand  // Set PoolId from the newly added Pool
+            };
+
+            return (obj, dr);
+        }
+
+        
+
     }
+
+
 }

@@ -1,6 +1,5 @@
 ﻿using Backend.Models;
 using Microsoft.EntityFrameworkCore;
-using Backend.Models.DTO;
 
 namespace Learning.Models
 {
@@ -14,8 +13,6 @@ namespace Learning.Models
         // Adding models to context
         public DbSet<User> Users { get; set; } = null!;   
 
-        public DbSet<Backend.Models.DTO.Driver> Driver { get; set; }
-
         public DbSet<Backend.Models.Passenger> Passenger { get; set; }
 
         public DbSet<Backend.Models.Pool> Pool { get; set; }
@@ -23,6 +20,10 @@ namespace Learning.Models
         public DbSet<Backend.Models.Routes> Routes { get; set; }
 
         public DbSet<Backend.Models.RouteOrder> RouteOrder { get; set; }
+
+        public DbSet<Backend.Models.Driver> Driver { get; set; }
+
+        public DbSet<Backend.Models.RequestJoin> RequestJoin { get; set; }
 
     }
 }

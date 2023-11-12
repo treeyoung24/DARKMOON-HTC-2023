@@ -16,7 +16,7 @@ namespace Backend.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.2");
 
-            modelBuilder.Entity("Backend.Models.DTO.Driver", b =>
+            modelBuilder.Entity("Backend.Models.Driver", b =>
                 {
                     b.Property<int>("DriverId")
                         .ValueGeneratedOnAdd()
@@ -38,9 +38,6 @@ namespace Backend.Migrations
                     b.Property<int>("PassengerId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.Property<float>("Fee")
-                        .HasColumnType("REAL");
 
                     b.Property<string>("PickupTime")
                         .HasColumnType("TEXT");
@@ -74,6 +71,26 @@ namespace Backend.Migrations
                     b.HasKey("PoolId");
 
                     b.ToTable("Pool");
+                });
+
+            modelBuilder.Entity("Backend.Models.RequestJoin", b =>
+                {
+                    b.Property<int>("PoolId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PickupTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("RouteId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("PoolId");
+
+                    b.ToTable("RequestJoin");
                 });
 
             modelBuilder.Entity("Backend.Models.RouteOrder", b =>

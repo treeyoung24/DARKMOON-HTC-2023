@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(GeneralContext))]
-    [Migration("20231111225408_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20231112033743_AddRequestJoin")]
+    partial class AddRequestJoin
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -19,7 +19,7 @@ namespace Backend.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.2");
 
-            modelBuilder.Entity("Backend.Models.DTO.Driver", b =>
+            modelBuilder.Entity("Backend.Models.Driver", b =>
                 {
                     b.Property<int>("DriverId")
                         .ValueGeneratedOnAdd()
@@ -41,9 +41,6 @@ namespace Backend.Migrations
                     b.Property<int>("PassengerId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.Property<float>("Fee")
-                        .HasColumnType("REAL");
 
                     b.Property<string>("PickupTime")
                         .HasColumnType("TEXT");
@@ -77,6 +74,63 @@ namespace Backend.Migrations
                     b.HasKey("PoolId");
 
                     b.ToTable("Pool");
+                });
+
+            modelBuilder.Entity("Backend.Models.RequestJoin", b =>
+                {
+                    b.Property<int>("PoolId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PickupTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("RouteId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("PoolId");
+
+                    b.ToTable("RequestJoin");
+                });
+
+            modelBuilder.Entity("Backend.Models.RouteOrder", b =>
+                {
+                    b.Property<int>("Order")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RouteId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Order");
+
+                    b.ToTable("RouteOrder");
+                });
+
+            modelBuilder.Entity("Backend.Models.Routes", b =>
+                {
+                    b.Property<int>("RouteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<float>("Distance")
+                        .HasColumnType("REAL");
+
+                    b.Property<int>("Duration")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Polylines")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("RouteId");
+
+                    b.ToTable("Routes");
                 });
 
             modelBuilder.Entity("Backend.Models.User", b =>

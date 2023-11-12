@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Backend.Models.DTO;
+using Backend.Models;
 using Learning.Models;
+using Humanizer;
 
 namespace Backend.Controllers
 {
@@ -28,7 +29,7 @@ namespace Backend.Controllers
             return await _context.Driver.ToListAsync();
         }
 
-        // GET: api/Drivers/5
+        // GET: api/Drivers/5 GET POOL BY POOL ID
         [HttpGet("{id}")]
         public async Task<ActionResult<Driver>> GetDriver(int id)
         {
@@ -40,6 +41,24 @@ namespace Backend.Controllers
             }
 
             return driver;
+        }
+
+        // GET: api/Drivers/5  GET POOL BY DRIVER ID
+        [HttpGet("GetDriverPools")]
+        public async Task<ActionResult<IEnumerable<Pool>>> GetByDriverID(int id)
+        {
+            var temp = _context.Driver
+               .Where(x => x.DriverId == id).FirstOrDefault();
+
+
+            if (temp == null)
+            {
+                return NotFound();
+            }
+
+            var pools = await _context.Pool.Where(x => x.PoolId == temp.PoolId).ToListAsync();
+
+            return pools;
         }
 
         // PUT: api/Drivers/5

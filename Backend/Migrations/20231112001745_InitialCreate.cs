@@ -56,6 +56,35 @@ namespace Backend.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RouteOrder",
+                columns: table => new
+                {
+                    Order = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    UserId = table.Column<int>(type: "INTEGER", nullable: false),
+                    RouteId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RouteOrder", x => x.Order);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Routes",
+                columns: table => new
+                {
+                    RouteId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Distance = table.Column<float>(type: "REAL", nullable: false),
+                    Duration = table.Column<int>(type: "INTEGER", nullable: false),
+                    Polylines = table.Column<string>(type: "TEXT", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Routes", x => x.RouteId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -85,6 +114,12 @@ namespace Backend.Migrations
 
             migrationBuilder.DropTable(
                 name: "Pool");
+
+            migrationBuilder.DropTable(
+                name: "RouteOrder");
+
+            migrationBuilder.DropTable(
+                name: "Routes");
 
             migrationBuilder.DropTable(
                 name: "Users");
