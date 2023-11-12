@@ -4,44 +4,45 @@ import "../styles/component.sass";
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { useEffect } from "react";
+import { ChangeEvent, useEffect } from "react";
 import { PoolDTO } from "../api/dtos/pool.dto";
 import { postPool } from "../api/services/pool.service";
+import React from "react";
+import { FieldChangeHandlerContext } from "@mui/x-date-pickers/internals";
 
 export function CreatePool() {
-    useEffect(() => {
-            const dto:PoolDTO = {
-                HostId: 1,
-                StartPoint: "123",
-                PoolSize: 1,
-                Destination: "123",
-                ArrivalTime: "11:00",
+    const [destination, setDestination] = React.useState<string>("");
+    const [poolSize, setPoolSize] = React.useState<number>(0);
+    const [arrivalTime, setArrivalTime] = React.useState<string>("");
+    const [arrivalDate, setArrivalDate] = React.useState<string>("");
+    const [hostId, setHostId] = React.useState<number>(0);
+
+
+        useEffect(() => {
+            const dto: PoolDTO = {
+                hostId: 1,
+                poolSize: poolSize,
+                destination: "123",
+                arrivalTime: "11:00",
             }
 
-            postPool(dto).then((res) => {
-                console.log(res);
-            })}, [])
+            // postPool(dto).then((res) => {
+            //     console.log(res);
+            // })
+
+        }, [])
     return (
         <div className="home">
             <div className="form">
-                <p>Create Pool</p>
-                <div className="my-4 mx-4 flex flex-col items-start md:mx-10">
-                    <label className="text-black">Starting Location</label>
-
-                    <input
-                        type="text"
-                        className="input"
-                        id="wifi-name"
-                    ></input>
-                </div>
-
+                <p className="mx-10">Create Pool</p>
                 <div className="my-4 mx-4 flex flex-col items-start md:mx-10">
                     <label className="text-black">Destination</label>
                     <input
                         type="text"
                         className="input"
                         id="text-input"
-                    ></input>
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDestination(e.target.value)}
+                    />
                 </div>
                 <div className="my-4 mx-4 flex flex-col items-start md:mx-10">
                     <label className="text-black">Pool Size</label>
@@ -49,13 +50,14 @@ export function CreatePool() {
                         type="text"
                         className="input"
                         id="text-input"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPoolSize(parseInt(e.target.value))}
                     ></input>
                 </div>
                 <div className="my-4 mx-4 flex flex-col items-start md:mx-10">
                     <label className="text-black">Time Arrival</label>
                     <Datepicker />
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <TimePicker label="Basic time picker" />
+                        <TimePicker label="Basic time picker"/>
                     </LocalizationProvider>
                 </div>
                 <Button type="contained" className="button-form" onClick={() => console.log('Create Pool clicked')}>Create</Button>
