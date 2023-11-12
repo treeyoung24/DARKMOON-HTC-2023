@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
 using Learning.Models;
+using Backend.Models.DTO;
 
 namespace Backend.Controllers
 {
@@ -30,16 +31,35 @@ namespace Backend.Controllers
 
         // GET: api/Routes/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Routes>> GetRoutes(int id)
+        public async Task<ActionResult<RouteDTO>> GetRoutes(int id)
         {
-            var routes = await _context.Routes.FindAsync(id);
+            Pool pool = await _context.Pool.FindAsync(id);
 
-            if (routes == null)
+            if (pool == null)
             {
                 return NotFound();
             }
+            var routes = await _context.Routes.FindAsync(pool.RouteId);
+            List<RouteOrderDTO> seg = new List<RouteOrderDTO>();
+            List<RouteOrder> routeOrders = await _context.RouteOrder.Where(x => x.RouteId == pool.RouteId).ToListAsync();
+            foreach (RouteOrder routeOrder in routeOrders)
+            {
+                seg.Add(new RouteOrderDTO
+                {
+                    UserID = routeOrder.UserId,
+                    Address = (await _context.Users.FindAsync(routeOrder.UserId)).Address,
+                    Order = routeOrder.Order
+                });
+            }
+            return new RouteDTO
+            {
+                RouteId = pool.RouteId, 
+                Distance = routes.Distance,
+                Duration = routes.Duration,
+                Polylines = routes.Polylines,
+                Segments = seg,
+            };
 
-            return routes;
         }
 
         // PUT: api/Routes/5
