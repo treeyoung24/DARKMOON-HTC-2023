@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
 using Learning.Models;
+using Backend.Models.DTO;
+using Humanizer;
 
 namespace Backend.Controllers
 {
@@ -74,27 +76,53 @@ namespace Backend.Controllers
         }
 
         // POST: api/RequestJoins
+        // ADD REQUEST JOIN
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<RequestJoin>> PostRequestJoin(RequestJoin requestJoin)
+        public async Task<ActionResult<RequestJoin>> PostRequestJoin(RequestDTO dto)
         {
-            _context.RequestJoin.Add(requestJoin);
+
+            RequestJoin obj = dtoToRequest(dto);
+            _context.RequestJoin.Add(obj);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetRequestJoin", new { id = requestJoin.PoolId }, requestJoin);
+            return CreatedAtAction("GetRequestJoin", new { id = obj.PoolId }, obj);
         }
 
         // DELETE: api/RequestJoins/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRequestJoin(int id)
+        // ACCEPT REQUEST 
+        [HttpDelete("AcceptRequest")]
+        public async Task<IActionResult> AcceptRequestJoin(RequestJoin requestJoin)
         {
-            var requestJoin = await _context.RequestJoin.FindAsync(id);
-            if (requestJoin == null)
+            var temp = _context.RequestJoin
+               .Where(x => x.PoolId == requestJoin.PoolId
+               && x.MemId == requestJoin.MemId).FirstOrDefault();
+
+            if (temp == null)
+            {
+                return NotFound();
+            }
+            _context.Passenger.Add(requestToPassenger(requestJoin));
+            _context.RequestJoin.Remove(temp);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        // DELETE: api/RequestJoins/5
+        // DELETE REQUEST OR REJECT
+        [HttpDelete("DeleteRequest")]
+        public async Task<IActionResult> DeleteRequestJoin(RequestJoin requestJoin)
+        {
+            var temp = _context.RequestJoin
+               .Where(x => x.PoolId == requestJoin.PoolId
+               && x.MemId == requestJoin.MemId).FirstOrDefault();
+            if (temp == null)
             {
                 return NotFound();
             }
 
-            _context.RequestJoin.Remove(requestJoin);
+            _context.RequestJoin.Remove(temp);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -103,6 +131,31 @@ namespace Backend.Controllers
         private bool RequestJoinExists(int id)
         {
             return _context.RequestJoin.Any(e => e.PoolId == id);
+        }
+
+        private RequestJoin dtoToRequest(RequestDTO dto)
+        {
+            RequestJoin obj = new RequestJoin
+            {
+                PoolId = dto.PoolId,
+                MemId = dto.MemId,
+                PickupTime = "",            // NEED ROUTE
+                RouteId = 0
+            };
+
+            return obj;
+        }
+
+        private Passenger requestToPassenger(RequestJoin request)
+        {
+            Passenger passenger = new Passenger
+            {
+                PoolId = request.PoolId,
+                PassengerId = request.MemId,
+                PickupTime = request.PickupTime
+            };
+
+            return passenger;
         }
     }
 }
