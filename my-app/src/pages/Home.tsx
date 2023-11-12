@@ -14,7 +14,7 @@ export function Home() {
     return (
         <div className="home">
             <div className="form">
-                <p>Search Pool</p>
+                <p className="mx-10">Search Pool</p>
                 <div className="my-4 mx-4 flex flex-col items-start md:mx-10">
                     <label className="text-black">Pick-up Location</label>
                     <input
