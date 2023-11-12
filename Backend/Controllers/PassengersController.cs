@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
 using Learning.Models;
+using Backend.Models.DTO;
 
 namespace Backend.Controllers
 {
@@ -85,17 +86,23 @@ namespace Backend.Controllers
         }
 
         // DELETE: api/Passengers/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePassenger(int id)
+        //  PASSENGER LEAVE
+        [HttpDelete("PassengerLeave")]
+        public async Task<IActionResult> DeletePassenger(PassengerDTO dto)
         {
-            var passenger = await _context.Passenger.FindAsync(id);
-            if (passenger == null)
+            var temp = _context.Passenger
+               .Where(x => x.PoolId == dto.PoolId
+               && x.PassengerId == dto.PassengerId).FirstOrDefault();
+
+            if (temp == null)
             {
                 return NotFound();
             }
 
-            _context.Passenger.Remove(passenger);
+            _context.Passenger.Remove(temp);
             await _context.SaveChangesAsync();
+
+            //UpdatePool(dto.PoolId);
 
             return NoContent();
         }
@@ -103,6 +110,20 @@ namespace Backend.Controllers
         private bool PassengerExists(int id)
         {
             return _context.Passenger.Any(e => e.PassengerId == id);
+        }
+
+        private async void UpdatePool(int id)
+        {
+            //int id = request.PoolId;
+            Pool pool = await _context.Pool.FindAsync(id);
+
+            // GENERATE NEW ROUTE
+            pool.RouteId = 0;
+
+            _context.Entry(pool).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();
+
         }
     }
 }
