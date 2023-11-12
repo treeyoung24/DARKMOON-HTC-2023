@@ -2,20 +2,25 @@ import { PoolCardPassenger, PoolCardPassengerProps } from "../components/PoolCar
 import { PoolCardDriver, PoolCardDriverProps } from "../components/PoolCardDriver";
 import React from "react";
 import { paste } from "@testing-library/user-event/dist/paste";
-import { getMyPool } from "../api/services/pool.service";
+import { getMyPool, getPassengerPool, getRequestPool } from "../api/services/pool.service";
 import { PoolDriverMyPoolDTOReturn } from "../api/dtos/pool-driver-mypool.dto";
+import { PassengerDTOReturn } from "../api/dtos/passenger.dto";
+import { PoolPassengerMyViewDTOReturn } from "../api/dtos/pool-passenger-myview.dto";
 
 
 export function ManagePool() {
     const [drivers, setDrivers] = React.useState<PoolDriverMyPoolDTOReturn[]>([]);
-    const [passengers, setPassengers] = React.useState<PoolCardPassengerProps[]>([]);
+    const [pendingPassengers, setPendingPassengers] = React.useState<PoolPassengerMyViewDTOReturn[]>([]);
+    const [approvedPassengers, setApprovedPassengers] = React.useState<PoolPassengerMyViewDTOReturn[]>([]);
 
     React.useEffect(() => {
-        getMyPool(1).then((res) => {
-            console.log(res);
-            setDrivers(drivers => ([ ...drivers, ...res]));
-            console.log(drivers);
+        const promises = [getMyPool(1), getPassengerPool(2), getRequestPool(1)];
 
+        Promise.all(promises).then(values => {
+            console.log(values);
+            setDrivers(drivers => ([ ...drivers, ...values[0]]));
+            setPendingPassengers(pendingPassengers => ([...pendingPassengers, ...values[1]]));
+            setApprovedPassengers(approvedPassengers => ([...approvedPassengers, ...values[2]]));
         }).catch((error) => {
             console.error(error);
         }
@@ -37,8 +42,12 @@ export function ManagePool() {
                 <p className="text-md mb-2">Request Pool</p>
                 <div className="container">
                     {
-                        passengers?.map((passenger: PoolCardPassengerProps) => {
-                            return <PoolCardPassenger pickupTime={passenger.pickupTime} pickupLocation={passenger.pickupLocation} arrivalTime={passenger.arrivalTime} co2Emmission={passenger.co2Emmission} numStop={passenger.numStop} fees={passenger.fees} />
+                        pendingPassengers.map((passenger: PoolPassengerMyViewDTOReturn) => {
+                            return <PoolCardPassenger key={passenger.poolId} numStop={passenger.stops} pickupTime={passenger.pickupTime} arrivalTime={passenger.arrivalTime} co2Emmission={passenger.co2} fees={passenger.fee} isPending={true}/>
+                        })}
+                    {
+                        approvedPassengers.map((passenger: PoolPassengerMyViewDTOReturn) => {
+                            return <PoolCardPassenger key={passenger.poolId} numStop={passenger.stops} pickupTime={passenger.pickupTime} arrivalTime={passenger.arrivalTime} co2Emmission={passenger.co2} fees={passenger.fee} isPending={false}/>
                         })}
                 </div>
             </div>

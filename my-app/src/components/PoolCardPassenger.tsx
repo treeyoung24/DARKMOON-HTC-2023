@@ -8,6 +8,7 @@ export interface PoolCardPassengerProps {
     co2Emmission: number;
     numStop: number;
     fees: number;
+    isPending: boolean;
 }
 
 
@@ -30,7 +31,12 @@ export function PoolCardPassenger(props: PoolCardPassengerProps) {
                 <p className="header">Fees</p>
                 <p>${props.fees}</p>
             </div>
-            <Button type="contained" className="button-form" onClick={() => console.log('Create Pool clicked')}>Cancel</Button>
+            {props.isPending === true && 
+                <Button type="contained" className="button-form" onClick={() => console.log('Create Pool clicked')}>Cancel</Button>
+            }
+            {props.isPending === false && 
+                <Button type="contained" className="button-form" onClick={() => console.log('Create Pool clicked')}>Exit</Button>
+            }
         </div>
     );
 }

@@ -1,6 +1,6 @@
 import { PassengerDTOReturn } from "../dtos/passenger.dto";
 import { PoolDriverMyPoolDTO, PoolDriverMyPoolDTOReturn } from "../dtos/pool-driver-mypool.dto";
-import { PoolPassengerMyViewDTO } from "../dtos/pool-passenger-myview.dto";
+import { PoolPassengerMyViewDTO, PoolPassengerMyViewDTOReturn } from "../dtos/pool-passenger-myview.dto";
 import { PoolDTO } from "../dtos/pool.dto";
 import { PoolViewDTOReturn } from "../dtos/poolview.dto";
 
@@ -63,11 +63,15 @@ export const postPool: (pool: PoolDTO) => Promise<any> = createApiRequestFunctio
 // Get My Pool - Driver
 export const getMyPool: (id: number) => Promise<ReturnDTO<PoolDriverMyPoolDTOReturn[]>> = createApiRequestFunction('GET', ENDPOINTS.pool + 'GetDriverPools');
 
-export const getPassengerPool: (passId: number) => Promise<ReturnDTO<PassengerDTOReturn[]>> = createApiRequestFunction('GET', ENDPOINTS.pool + 'GetPassengerPools');
-export const getPoolDetail: (poolId: number) => Promise<ReturnDTO<PoolViewDTOReturn>> = createApiRequestFunction('GET', ENDPOINTS.pool);
+// Get My Join Request
+export const getPassengerPool: (passId: number) => Promise<ReturnDTO<PoolPassengerMyViewDTOReturn[]>> = createApiRequestFunction('GET', ENDPOINTS.pool + 'GetPassengerPools');
 
 // Get all join request of a pool
-export const getRequestPool: (passId: number) => Promise<any> = createApiRequestFunction('GET', ENDPOINTS.requestJoin + 'GetPassengerRequest');
+export const getRequestPool: (passId: number) => Promise<ReturnDTO<PoolPassengerMyViewDTOReturn[]>> = createApiRequestFunction('GET', ENDPOINTS.requestJoin + 'GetPassengerRequest');
+
+// Get Pool Detail
+export const getPoolDetail: (poolId: number) => Promise<ReturnDTO<PoolViewDTOReturn>> = createApiRequestFunction('GET', ENDPOINTS.pool);
+
 
 // Get all pending requests of a pool
 export const getPendingRequests: (poolId: number) => Promise<any> = createApiRequestFunction('GET', ENDPOINTS.requestJoin + 'GetAllPendingRequest');

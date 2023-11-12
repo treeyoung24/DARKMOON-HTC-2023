@@ -13,35 +13,20 @@ import { FieldChangeHandlerContext } from "@mui/x-date-pickers/internals";
 import { useNavigate } from "react-router-dom";
 
 export function CreatePool() {
-    const [destination, setDestination] = React.useState<string>("");
-    const [poolSize, setPoolSize] = React.useState<number>(0);
-    const [arrivalTime, setArrivalTime] = React.useState<string>("");
+    const [destination, setDestination] = React.useState<string>("588 Aero Dr NE #106, Calgary, AB T2E 7Y4");
+    const [poolSize, setPoolSize] = React.useState<number>(1);
+    const [arrivalTime, setArrivalTime] = React.useState<string>("2023-11-15T15:01:23.045123456Z");
     const [arrivalDate, setArrivalDate] = React.useState<string>("");
-    const [hostId, setHostId] = React.useState<number>(0);
+    const [hostId, setHostId] = React.useState<number>(1);
 
+    const dto: PoolDTO = {
+        hostId: 1,
+        poolSize: 1,
+        destination: "588 Aero Dr NE #106, Calgary, AB T2E 7Y4",
+        arrivalTime: "2023-11-15T15:01:23.045123456Z",
+    }
     const navigate = useNavigate();
 
-        useEffect(() => {
-            const dto:PoolDTO = {
-                hostId: 1,
-                poolSize: 1,
-                destination: "588 Aero Dr NE #106, Calgary, AB T2E 7Y4",
-                arrivalTime: "2023-11-15T15:01:23.045123456Z",
-            }
-
-            // postPool(dto, ENDPOINTS.pool).then((res) => {
-            //     console.log(res);
-            //     console.log("Success")
-            // })
-
-            postPool(dto).then((res) => {
-                console.log(res);
-                console.log("Success");
-                navigate(`/manage-pool/${res.data.poolId}`, { replace: true });
-            }).catch((error) => {
-                console.error(error);
-            });
-        }, [])
     return (
         <div className="home">
             <div className="form">
@@ -52,6 +37,7 @@ export function CreatePool() {
                         type="text"
                         className="input"
                         id="text-input"
+                        value={destination}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDestination(e.target.value)}
                     />
                 </div>
@@ -61,6 +47,7 @@ export function CreatePool() {
                         type="text"
                         className="input"
                         id="text-input"
+                        value={poolSize}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPoolSize(parseInt(e.target.value))}
                     ></input>
                 </div>
@@ -68,10 +55,14 @@ export function CreatePool() {
                     <label className="text-black">Time Arrival</label>
                     <Datepicker />
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <TimePicker label="Basic time picker"/>
+                        <TimePicker label="Basic time picker" />
                     </LocalizationProvider>
                 </div>
-                <Button type="contained" className="button-form" onClick={() => console.log('Create Pool clicked')}>Create</Button>
+                <Button type="contained" className="button-form" onClick={() => postPool(dto).then((res) => {
+                    navigate(`/manage-pool/${res.poolId}`, { replace: true });
+                }).catch((error) => {
+                    console.error(error);
+                })}>Create</Button>
             </div>
         </div>
     )
