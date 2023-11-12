@@ -45,19 +45,57 @@ namespace Backend.Controllers
         }
 
         // GET: api/Pools/5
-        //[HttpGet("GetDriverPools")]
-        //public async Task<ActionResult<IEnumerable<Pool>>> GetDriverPools(int id)
-        //{
-        //    var temp = _context.Pool
-        //       .Where(x => x.HostId == id).ToListAsync();
+        [HttpGet("GetAllUserPools")]
+        public async Task<ActionResult<IEnumerable<Pool>>> GetAllUserPools(int id)
+        {
+            var driver = await GetDriverPools(id);
+            var passenger = await GetPassengerPools(id);
 
-        //    if (temp == null)
-        //    {
-        //        return NotFound();
-        //    }
+            var combinedPools = driver.Value.Concat(passenger.Value);
 
-        //    return temp;
-        //}
+            return Ok(combinedPools);
+        }
+
+        //GET: api/Pools/5
+        [HttpGet("GetDriverPools")]
+        public async Task<ActionResult<IEnumerable<Pool>>> GetDriverPools(int id)
+        {
+            var temp = await _context.Pool
+               .Where(x => x.HostId == id).ToListAsync();
+
+            if (temp == null)
+            {
+                return NotFound();
+            }
+
+            return temp;
+        }
+
+        //GET: api/Pools/5
+        [HttpGet("GetPassengerPools")]
+        public async Task<ActionResult<IEnumerable<Pool>>> GetPassengerPools(int id)
+        {
+            var passenger = await _context.Passenger
+               .Where(x => x.PassengerId == id).ToListAsync(); 
+
+            if (passenger.Count == 0 || passenger == null)
+            {
+                return NotFound();
+            }
+
+            
+            List<Pool> pools = new List<Pool>();
+            foreach (var t in passenger) // Specify the type of 't'
+            {
+                var pool = await _context.Pool.FindAsync(t.PoolId);
+                if (pool != null)
+                {
+                    pools.Add(pool);
+                }
+            }
+
+            return pools;
+        }
 
         // PUT: api/Pools/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Backend.Models;
 using Learning.Models;
 using Backend.Models.DTO;
+using Humanizer;
 
 namespace Backend.Controllers
 {
@@ -30,10 +31,12 @@ namespace Backend.Controllers
         }
 
         // GET: api/Passengers/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Passenger>> GetPassenger(int id)
+        [HttpGet("GetPassengerPool")]
+        public async Task<ActionResult<IEnumerable<Passenger>>> GetPassenger(int poolId, int passId)
         {
-            var passenger = await _context.Passenger.FindAsync(id);
+            var passenger = await _context.Passenger
+               .Where(x => x.PoolId == poolId
+               && x.PassengerId == passId).ToListAsync(); ;
 
             if (passenger == null)
             {
@@ -102,7 +105,7 @@ namespace Backend.Controllers
             _context.Passenger.Remove(temp);
             await _context.SaveChangesAsync();
 
-            //UpdatePool(dto.PoolId);
+            UpdatePool(dto.PoolId);
 
             return NoContent();
         }

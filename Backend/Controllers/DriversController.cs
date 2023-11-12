@@ -44,22 +44,22 @@ namespace Backend.Controllers
         }
 
         // GET: api/Drivers/5  GET POOL BY DRIVER ID
-        [HttpGet("GetDriverPools")]
-        public async Task<ActionResult<IEnumerable<Pool>>> GetByDriverID(int id)
-        {
-            var temp = _context.Driver
-               .Where(x => x.DriverId == id).FirstOrDefault();
+        //[HttpGet("GetDriverPools")]
+        //public async Task<ActionResult<IEnumerable<Pool>>> GetByDriverID(int id)
+        //{
+        //    var temp = _context.Driver
+        //       .Where(x => x.DriverId == id).FirstOrDefault();
 
 
-            if (temp == null)
-            {
-                return NotFound();
-            }
+        //    if (temp == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var pools = await _context.Pool.Where(x => x.PoolId == temp.PoolId).ToListAsync();
+        //    var pools = await _context.Pool.Where(x => x.PoolId == temp.PoolId).ToListAsync();
 
-            return pools;
-        }
+        //    return pools;
+        //}
 
         // PUT: api/Drivers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

@@ -25,21 +25,34 @@ namespace Learning.Models
 
         public DbSet<Backend.Models.RequestJoin> RequestJoin { get; set; }
 
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
-        //{
-        //    modelBuilder.Entity<User>().HasData(
-        //        new User
-        //        {
-        //UserId = 1,
-        //            Name = "William Shakespeare",
-        //            Email = "williamShakespeare@gmail.com",
-        //            Phone = "4031234567",
-        //            Address = "9 Avenue Southwest, Calgary, AB",
-        //            Gender = "male",
-        //            Age = 20
-        //        }
-        //    );
-        //}
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<RequestJoin>()
+                .HasKey(rj => new { rj.PoolId, rj.MemId
+            });
+
+            modelBuilder.Entity<RouteOrder>()
+                .HasKey(rj => new {
+                    rj.Order,
+                    rj.UserId,
+                    rj.RouteId
+                });
+
+            modelBuilder.Entity<Passenger>()
+                .HasKey(rj => new {
+                    rj.PoolId,
+                    rj.PassengerId,
+                });
+
+            modelBuilder.Entity<Driver>()
+                .HasKey(rj => new {
+                    rj.PoolId,
+                    rj.DriverId,
+                });
+
+        }
 
 
     }

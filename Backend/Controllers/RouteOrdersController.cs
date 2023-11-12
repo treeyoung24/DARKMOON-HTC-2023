@@ -79,7 +79,21 @@ namespace Backend.Controllers
         public async Task<ActionResult<RouteOrder>> PostRouteOrder(RouteOrder routeOrder)
         {
             _context.RouteOrder.Add(routeOrder);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                if (RouteOrderExists(routeOrder.Order))
+                {
+                    return Conflict();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
             return CreatedAtAction("GetRouteOrder", new { id = routeOrder.Order }, routeOrder);
         }
