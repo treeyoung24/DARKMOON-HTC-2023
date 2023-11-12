@@ -298,6 +298,7 @@ namespace Backend.Controllers
             {
                 return NotFound();
             }
+
             _context.Passenger.Add(requestToPassenger(temp));            // Add passenger
             _context.JoinedPoll.Add(RequestPollToJoinedPoll(temp));      // Add JoinedPoll
             _context.RequestJoin.Remove(temp);
@@ -377,8 +378,19 @@ namespace Backend.Controllers
             Pool pool = await _context.Pool.FindAsync(request.PoolId);
 
             pool.RouteId = request.RouteId;
-
             _context.Entry(pool).State = EntityState.Modified;
+            Routes route = await _context.Routes.FindAsync(request.RouteId);
+            // Driver
+            Driver dr = _context.Driver
+               .Where(x => x.PoolId == pool.PoolId
+               && x.DriverId == pool.HostId).FirstOrDefault(); 
+
+            DateTime arrTime = DateTime.Parse(pool.ArrivalTime, null, DateTimeStyles.RoundtripKind);
+            
+            dr.StartTime = arrTime.AddSeconds(0 - route.Duration).ToString();
+
+            _context.Entry(dr).State = EntityState.Modified;
+
 
             await _context.SaveChangesAsync();  
 
