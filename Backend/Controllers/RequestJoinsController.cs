@@ -53,7 +53,7 @@ namespace Backend.Controllers
 
         // GET: api/RequestJoins/5
         [HttpGet("GetPassengerRequest")]
-        public async Task<ActionResult<IEnumerable<RequestJoin>>> GetPassengerRequest(int MemId)
+        public async Task<ActionResult<IEnumerable<PoolPassengerMyView>>> GetPassengerRequest(int MemId)
         {
             var temp = await _context.RequestJoin
                .Where(x => x.MemId == MemId).ToListAsync();
@@ -63,7 +63,27 @@ namespace Backend.Controllers
                 return NotFound();
             }
 
-            return temp;
+            List<PoolPassengerMyView> pools = new List<PoolPassengerMyView>();
+            foreach (RequestJoin pv in temp)
+            {
+                
+                var temp2 = RequestToPassengerView(pv);
+                Pool pool = await _context.Pool.FindAsync(temp2.PoolId);
+                if (pool != null)
+                {
+                    var pass = await _context.Passenger.Where(x => x.PoolId == pool.PoolId && x.PassengerId != MemId).ToListAsync();
+
+                    temp2.ArrivalTime = pool.ArrivalTime;
+                    temp2.Stops = pass.Count;
+
+                    pools.Add(temp2);
+                }
+                    
+            }
+
+            
+
+            return pools;
         }
 
         // GET: api/RequestJoins/5
@@ -370,6 +390,20 @@ namespace Backend.Controllers
             };
 
             return joined;
+        }
+
+        private PoolPassengerMyView RequestToPassengerView(RequestJoin requestJoin)
+        {
+            
+
+            PoolPassengerMyView passPool = new PoolPassengerMyView
+            {
+                PoolId = requestJoin.PoolId,
+                CO2 = 250,
+                Fee = 3.25f,
+            };
+
+            return passPool;
         }
 
         private async void UpdatePool(RequestJoin request)
