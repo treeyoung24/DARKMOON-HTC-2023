@@ -7,7 +7,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { RequestTable } from "../components/RequestTable";
 import { DriverMap } from "./DriverMap";
 import { useParams } from "react-router-dom";
-import { getPoolDetail } from "../api/services/pool.service";
+import { getPoolDetail, getRouteUsingPoolId } from "../api/services/pool.service";
 import { useEffect } from "react";
 import React from "react";
 
@@ -18,18 +18,23 @@ export function ManageDetailedPool() {
     const [arrivalTime, setArrivalTime] = React.useState<string>("");
     const [arrivalDate, setArrivalDate] = React.useState<string>("");
     const [startingPoint, setStartingPoint] = React.useState<string>("");
+    const [polyline, setPolyline] = React.useState<string>("");
 
 
 
 
     useEffect(() => {
-        getPoolDetail(Number(poolId)).then((res) => {
-            console.log(res.data);
-            setDestination(res.destination);
-            setPoolSize(res.poolSize);
-            setArrivalTime(res.arrivalTime);
-            setStartingPoint(res.startingPoint);
+        getRouteUsingPoolId(Number(poolId)).then((res) => {
+            setPolyline(res.polyline);
         })
+        // getPoolDetail(Number(poolId)).then((res) => {
+        //     console.log(res.data);
+            // setDestination(res.destination);
+            // setPoolSize(res.poolSize);
+            // setArrivalTime(res.arrivalTime);
+            // setStartingPoint(res.startingPoint);
+
+        //})getRouteUsingPoolId
     }
         , [poolId]);
 
@@ -80,7 +85,7 @@ export function ManageDetailedPool() {
             </div>
             <div className="flex flex-col items-center mt-20">
                 <p className="text-lg">Navigation Map</p>
-                <DriverMap />
+                <DriverMap polyline={polyline} />
             </div>
         </div>
 

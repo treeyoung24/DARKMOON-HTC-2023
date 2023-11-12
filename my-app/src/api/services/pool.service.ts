@@ -71,3 +71,4 @@ export const getRequestPool: (passId: number) => Promise<any> = createApiRequest
 
 // Get all pending requests of a pool
 export const getPendingRequests: (poolId: number) => Promise<any> = createApiRequestFunction('GET', ENDPOINTS.requestJoin + 'GetAllPendingRequest');
+export const getRouteUsingPoolId: (poolId: number) => Promise<any> = createApiRequestFunction('GET', ENDPOINTS.route);

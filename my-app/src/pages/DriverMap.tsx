@@ -10,13 +10,18 @@ const center = {
     lng: -38.523
 };
 
-export const DriverMap = () => {
+interface DriverMapProps { polyline: string }
+
+export const DriverMap = ({ polyline }: DriverMapProps) => {
 
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
-        googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || ''})
+        googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || ''
+    })
 
     const [map, setMap] = React.useState(null)
+    const decodedPath = window.google.maps.geometry.encoding.decodePath(polyline);
+    console.log(decodedPath);
 
     const onLoad = React.useCallback(function callback(map: any) {
         // This is just an example of getting and using the map instance!!! don't just blindly copy!
