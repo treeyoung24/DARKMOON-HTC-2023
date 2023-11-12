@@ -252,7 +252,7 @@ namespace Backend.Controllers
             int time = 0;
             for (int i = 0;i < addressList.Count; i++)
             {
-                if(i > recordedI)
+                if(i >= recordedI)
                 {
                     var k = newitem.routes[0].legs[i];
                     time += Int32.Parse(k.duration.ToString().Remove(k.duration.ToString().Length - 1));
@@ -288,7 +288,7 @@ namespace Backend.Controllers
         // DELETE: api/RequestJoins/5
         // ACCEPT REQUEST 
         [HttpDelete("AcceptRequest")]
-        public async Task<IActionResult> AcceptRequestJoin(RequestJoin requestJoin)
+        public async Task<IActionResult> AcceptRequestJoin(RequestDTO requestJoin)
         {
             var temp = _context.RequestJoin
                .Where(x => x.PoolId == requestJoin.PoolId
@@ -298,13 +298,13 @@ namespace Backend.Controllers
             {
                 return NotFound();
             }
-            _context.Passenger.Add(requestToPassenger(requestJoin));            // Add passenger
-            _context.JoinedPoll.Add(RequestPollToJoinedPoll(requestJoin));      // Add JoinedPoll
+            _context.Passenger.Add(requestToPassenger(temp));            // Add passenger
+            _context.JoinedPoll.Add(RequestPollToJoinedPoll(temp));      // Add JoinedPoll
             _context.RequestJoin.Remove(temp);
             await _context.SaveChangesAsync();
 
             // Update route in pool
-            UpdatePool(requestJoin);
+            UpdatePool(temp);
 
             return NoContent();
         }
