@@ -23,5 +23,7 @@ namespace Learning.Models
 
         public DbSet<Backend.Models.Driver> Driver { get; set; }
 
+        public DbSet<Backend.Models.RequestJoin> RequestJoin { get; set; }
+
     }
 }
