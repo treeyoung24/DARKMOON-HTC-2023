@@ -8,6 +8,7 @@ import { RequestTable } from "../components/RequestTable";
 import { DriverMap } from "./DriverMap";
 import { useParams } from "react-router-dom";
 import { getPoolDetail } from "../api/services/pool.service";
+import { createAPIEndpoint, ENDPOINTS } from "../api/services/axios.service";
 import { useEffect } from "react";
 import React from "react";
 
@@ -23,15 +24,30 @@ export function ManageDetailedPool() {
 
 
     useEffect(() => {
-        getPoolDetail(Number(poolId)).then((res) => {
-            console.log(res.data);
-            setDestination(res.destination);
-            setPoolSize(res.poolSize);
-            setArrivalTime(res.arrivalTime);
-            setStartingPoint(res.startingPoint);
-        })
+        createAPIEndpoint(ENDPOINTS.pool)
+                .fetchById(Number(poolId))
+                .then(res => {
+                    console.log(res.data);
+                    setDestination(res.destination);
+                    setPoolSize(res.poolSize);
+                    setArrivalTime(res.arrivalTime);
+                    setStartingPoint(res.startingPoint);
+                })
+                .catch(err => {
+                  console.log("Error");
+                })
     }
-        , [poolId]);
+
+        // getPoolDetail(Number(poolId)).then((res) => {
+        //     console.log(res.data);
+        //     setDestination(res.destination);
+        //     setPoolSize(res.poolSize);
+        //     setArrivalTime(res.arrivalTime);
+        //     setStartingPoint(res.startingPoint);
+        // }) 
+    , [poolId]);
+    
+        
 
     return (
         <div>
