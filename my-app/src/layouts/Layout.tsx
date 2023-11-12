@@ -18,7 +18,7 @@ export const Layout: React.FC = () => {
                     <Route path="/" element={<Home />} />
                     <Route path="/home" element={<Home />} />
                     <Route path="/create-pool" element={<CreatePool />} />
-                    <Route path="/manage-pool" element={<ManagePool />} />
+                    <Route path="/manage-pool/" element={<ManagePool />} />
                     <Route path="/manage-pool/:poolId" element={<ManageDetailedPool />} />
                 </Routes>
             </div>

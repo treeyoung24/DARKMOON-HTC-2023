@@ -9,15 +9,29 @@ import { DriverMap } from "./DriverMap";
 import { useParams } from "react-router-dom";
 import { getPoolDetail } from "../api/services/pool.service";
 import { useEffect } from "react";
+import React from "react";
 
 export function ManageDetailedPool() {
-    const {poolId} = useParams();
+    const { poolId } = useParams();
+    const [destination, setDestination] = React.useState<string>("");
+    const [poolSize, setPoolSize] = React.useState<number>(0);
+    const [arrivalTime, setArrivalTime] = React.useState<string>("");
+    const [arrivalDate, setArrivalDate] = React.useState<string>("");
+    const [startingPoint, setStartingPoint] = React.useState<string>("");
+
+
+
 
     useEffect(() => {
         getPoolDetail(Number(poolId)).then((res) => {
-            console.log(res.data);})}
-
-            , [poolId]);
+            console.log(res.data);
+            setDestination(res.data.destination);
+            setPoolSize(res.data.poolSize);
+            setArrivalTime(res.data.arrivalTime);
+            setStartingPoint(res.data.startingPoint);
+        })
+    }
+        , [poolId]);
 
     return (
         <div>
@@ -31,6 +45,7 @@ export function ManageDetailedPool() {
                             type="text"
                             className="input"
                             id="wifi-name"
+                            value={startingPoint}
                         ></input>
                     </div>
 
@@ -40,6 +55,7 @@ export function ManageDetailedPool() {
                             type="text"
                             className="input"
                             id="text-input"
+                            value={destination}
                         ></input>
                     </div>
                     <div className="my-4 mx-4 flex flex-col items-start md:mx-10">
@@ -48,6 +64,7 @@ export function ManageDetailedPool() {
                             type="text"
                             className="input"
                             id="text-input"
+                            value={poolSize}
                         ></input>
                     </div>
                     <div className="my-4 mx-4 flex flex-col items-start md:mx-10">

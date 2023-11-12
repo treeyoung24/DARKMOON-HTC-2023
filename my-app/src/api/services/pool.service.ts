@@ -2,6 +2,7 @@ import { PassengerDTOReturn } from "../dtos/passenger.dto";
 import { PoolDriverMyPoolDTO, PoolDriverMyPoolDTOReturn } from "../dtos/pool-driver-mypool.dto";
 import { PoolPassengerMyViewDTO } from "../dtos/pool-passenger-myview.dto";
 import { PoolDTO } from "../dtos/pool.dto";
+import { PoolViewDTOReturn } from "../dtos/poolview.dto";
 
 const rootUrl = 'https://localhost:7113/api/';
 
@@ -57,4 +58,4 @@ export const postPool: (pool: PoolDTO) => Promise<any> = createApiRequestFunctio
 export const getMyPool: (id: number) => Promise<ReturnDTO<PoolDriverMyPoolDTOReturn[]>> = createApiRequestFunction('POST', ENDPOINTS.pool + 'GetDriverPools');
 
 export const getPassengerPool: (passId: number) => Promise<ReturnDTO<PassengerDTOReturn[]>> = createApiRequestFunction('GET', ENDPOINTS.pool + 'GetPassengerPools');
-export const getPoolDetail: (poolId: number) => Promise<any> = createApiRequestFunction('GET', ENDPOINTS.pool);
+export const getPoolDetail: (poolId: number) => Promise<ReturnDTO<PoolViewDTOReturn>> = createApiRequestFunction('GET', ENDPOINTS.pool);
