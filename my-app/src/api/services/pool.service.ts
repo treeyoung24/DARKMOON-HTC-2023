@@ -1,4 +1,5 @@
 import { PoolDriverMyPoolDTO } from "../dtos/pool-driver-mypool.dto";
+import { PoolPassengerMyViewDTO } from "../dtos/pool-passenger-myview.dto";
 import { PoolDTO } from "../dtos/pool.dto";
 
 
@@ -46,3 +47,4 @@ const createApiRequestFunction = (method: string, endpointSuffix?: string) => {
 // export const postRoute = createApiRequestFunction('POST')(ENDPOINTS.route);
 export const postPool: (endpoint: string, pool: PoolDTO) => Promise<any> = createApiRequestFunction('POST');
 export const getMyPool: (endpoint: string, pool: PoolDriverMyPoolDTO) => Promise<any> = createApiRequestFunction('POST', 'GetDriverPools');
+export const getRequestPool: (endpoint: string, pool: PoolPassengerMyViewDTO) => Promise<any> = createApiRequestFunction('POST', 'GetPassengerPools');
