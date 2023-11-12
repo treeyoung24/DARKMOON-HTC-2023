@@ -9,6 +9,12 @@ using Backend.Models;
 using Learning.Models;
 using Backend.Models.DTO;
 using Humanizer;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Net;
+using Newtonsoft.Json;
+using System.Text;
+using static System.Net.Mime.MediaTypeNames;
+using System.Globalization;
 
 namespace Backend.Controllers
 {
@@ -97,10 +103,170 @@ namespace Backend.Controllers
         {
 
             RequestJoin obj = dtoToRequest(dto);
+
+            List<Passenger> passengerList = await _context.Passenger
+               .Where(x => x.PoolId == dto.PoolId).ToListAsync();
+
+            List<String> addressList = new List<string>();
+            foreach(Passenger p in  passengerList)
+            {
+                addressList.Add((await _context.Users.FindAsync(p.PassengerId)).Address);
+            }
+            String startPoint = await getStartAddressFromPoolId(obj.PoolId);
+            Pool pool = await _context.Pool.FindAsync(obj.PoolId);
+            int minInt = 0;
+            HttpResponseMessage savedResponse= null;
+            int recordedI = 0;
+            for (int i = 0; i < passengerList.Count; i++)
+            {
+                Console.WriteLine(0);
+                List<String> aList = new List<String>(addressList);
+                aList.Insert(i, (await _context.Users.FindAsync(obj.MemId)).Address);
+                var addressJsonList = aList.Select(x => new { address = x }).ToArray();
+                // prepare request
+                var client = new HttpClient();
+                String url = "https://routes.googleapis.com/directions/v2:computeRoutes?key=" + Environment.GetEnvironmentVariable("API_KEY");
+                HttpRequestMessage httpRequest = new HttpRequestMessage(HttpMethod.Post, url);
+                var routeRequest = new
+                {
+                    origin = new { address = startPoint, sideOfRoad = true },
+                    destination = new { address = pool.Destination },
+                    intermediates = addressJsonList,
+                    travelMode = "DRIVE",
+                    routingPreference = "TRAFFIC_AWARE_OPTIMAL",
+                    arrivalTime = pool.ArrivalTime,
+                    computeAlternativeRoutes = false,
+                    routeModifiers = new { vehicleInfo = new { emissionType = "GASOLINE" } },
+                    languageCode = "en-US",
+                    units = "IMPERIAL"
+                };
+
+                //Console.Write(JsonConvert.SerializeObject(routeRequest));
+                //Console.Write("\n");
+
+                httpRequest.Content = new StringContent(
+                    JsonConvert.SerializeObject(routeRequest), Encoding.UTF8, "application/json");
+                httpRequest.Headers.Add("X-Goog-FieldMask",
+                    "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline,routes.legs.duration");
+                HttpResponseMessage response = await client.SendAsync(httpRequest);
+                dynamic item = JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync());
+                // Generate Route
+                int duration = Int32.Parse(
+                    item.routes[0].duration.ToString().Remove(item.routes[0].duration.ToString().Length - 1)
+                    );
+
+
+                if(i == 0)
+                {
+                    savedResponse = response; ;
+                    minInt = duration;
+                    recordedI = i;
+                    Console.WriteLine(1);
+                }
+                if(minInt < duration)
+                {
+                    savedResponse = response; ;
+                    minInt = duration;
+                    recordedI = i;
+                    Console.WriteLine(2);
+                }
+            }
+            if(addressList.Count == 0)
+            {
+                List<String> aList = new List<String>();
+
+                aList.Add((await _context.Users.FindAsync(obj.MemId)).Address);
+                var addressJsonList = aList.Select(x => new { address = x }).ToArray();
+                // prepare request
+                var client = new HttpClient();
+                String url = "https://routes.googleapis.com/directions/v2:computeRoutes?key=" + Environment.GetEnvironmentVariable("API_KEY");
+                HttpRequestMessage httpRequest = new HttpRequestMessage(HttpMethod.Post, url);
+                var routeRequest = new
+                {
+                    origin = new { address = startPoint, sideOfRoad = true },
+                    destination = new { address = pool.Destination },
+                    intermediates = addressJsonList,
+                    travelMode = "DRIVE",
+                    routingPreference = "TRAFFIC_AWARE_OPTIMAL",
+                    arrivalTime = pool.ArrivalTime,
+                    computeAlternativeRoutes = false,
+                    routeModifiers = new { vehicleInfo = new { emissionType = "GASOLINE" } },
+                    languageCode = "en-US",
+                    units = "IMPERIAL"
+                };
+
+                Console.Write(JsonConvert.SerializeObject(routeRequest));
+                //Console.Write("\n");
+
+                httpRequest.Content = new StringContent(
+                    JsonConvert.SerializeObject(routeRequest), Encoding.UTF8, "application/json");
+                httpRequest.Headers.Add("X-Goog-FieldMask",
+                    "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline,routes.legs.duration");
+                HttpResponseMessage response = await client.SendAsync(httpRequest);
+                Console.Write((await response.Content.ReadAsStringAsync()));
+                dynamic item = JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync());
+                // Generate Route
+                int duration = Int32.Parse(
+                    item.routes[0].duration.ToString().Remove(item.routes[0].duration.ToString().Length - 1)
+                    );
+
+                    savedResponse = response; ;
+                    minInt = duration;
+                    recordedI = 0;
+                    Console.WriteLine(2);
+            }
+            Console.Write(savedResponse.ToString());
+            dynamic newitem = JsonConvert.DeserializeObject(await savedResponse.Content.ReadAsStringAsync());
+            int newduration = Int32.Parse(
+                newitem.routes[0].duration.ToString().Remove(newitem.routes[0].duration.ToString().Length - 1)
+                );
+            Random random = new Random();
+            Routes newRoute = new Routes
+            {
+                RouteId = random.Next(10000000, 99999999),
+                Distance = newitem.routes[0].distanceMeters,
+                Duration = newduration,
+                Polylines = newitem.routes[0].polyline.encodedPolyline
+            };
+
+            addressList.Insert(recordedI, (await _context.Users.FindAsync(obj.MemId)).Address);
+
+            obj.RouteId = newRoute.RouteId;
+
+            int time = 0;
+            for (int i = 0;i < addressList.Count; i++)
+            {
+                if(i > recordedI)
+                {
+                    var k = newitem.routes[0].legs[i];
+                    time += Int32.Parse(k.duration.ToString().Remove(k.duration.ToString().Length - 1));
+                }
+
+                RouteOrder newOrder = new RouteOrder();
+                newOrder.RouteId = newRoute.RouteId;
+                newOrder.UserId =  _context.Users.Where(x => x.Address.Equals(addressList[i])).FirstOrDefault().UserId;
+                newOrder.Order = i;
+                _context.RouteOrder.Add(newOrder);
+                await _context.SaveChangesAsync();
+            }
+            DateTime dateTimeOffset = DateTime.Parse(pool.ArrivalTime, null, DateTimeStyles.RoundtripKind);
+            
+            obj.PickupTime = dateTimeOffset.AddSeconds(0-time).ToString(); 
+
+            _context.Routes.Add(newRoute);
+            await _context.SaveChangesAsync();
+
             _context.RequestJoin.Add(obj);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetRequestJoin", new { id = obj.PoolId }, obj);
+        }
+
+        private async Task<String> getStartAddressFromPoolId(int poolId)
+        {
+            Pool pool = await _context.Pool.FindAsync(poolId);
+            User user = await _context.Users.FindAsync(pool.HostId);
+            return user.Address;
         }
 
         // DELETE: api/RequestJoins/5
