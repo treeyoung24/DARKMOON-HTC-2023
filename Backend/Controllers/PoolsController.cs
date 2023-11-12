@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
 using Learning.Models;
+using Backend.Models.DTO;
 
 namespace Backend.Controllers
 {
@@ -76,12 +77,15 @@ namespace Backend.Controllers
         // POST: api/Pools
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Pool>> PostPool(Pool pool)
+        public async Task<ActionResult<Pool>> PostPool(PoolDTO dto)
         {
-            _context.Pool.Add(pool);
+            Pool obj = dtoToPool(dto);
+
+            //_context.Pool
+            _context.Pool.Add(obj);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetPool", new { id = pool.PoolId }, pool);
+            return CreatedAtAction("GetPool", new { id = obj.PoolId }, obj);
         }
 
         // DELETE: api/Pools/5
@@ -103,6 +107,17 @@ namespace Backend.Controllers
         private bool PoolExists(int id)
         {
             return _context.Pool.Any(e => e.PoolId == id);
+        }
+
+        private Pool dtoToPool(PoolDTO dto)
+        {
+            Pool obj = new Pool();
+            obj.PoolSize = dto.PoolSize;
+            obj.ArrivalTime = dto.ArrivalTime;
+            obj.Destination = dto.Destination;
+            obj.HostId = dto.HostId;
+
+            return obj;
         }
     }
 }
