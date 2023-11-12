@@ -34,8 +34,7 @@
 
 .pool-card
   @apply flex flex-row justify-between items-center rounded-xl shadow-sm shadow-slate-600 py-10
-  width: 80%
-  min-width: 45rem
+  width: auto
   padding-left: 2.5rem
   margin-left: -10%
   @apply shadow-md
@@ -46,5 +45,24 @@
     color: $color-purple
     font-weight: bold
     margin-bottom: 0.5rem
+
+.request-table
+  background: $color-primary
+  @apply flex flex-col justify-center items-center rounded-xl shadow-sm shadow-slate-600 p-8
+  height: 80%
+  margin-left: -10%
+
+  > p
+   @apply text-lg m-3
+
+  .pending, .accepted
+    @apply flex justify-start items-start w-full rounded-xl shadow-sm
+    background: $color-secondary
+    height: 40%
+    overflow: scroll
+    .pending-item, .accepted-item
+      @apply flex w-full justify-around items-center py-1 mx-1
+      p
+        @apply mx-3
 
 

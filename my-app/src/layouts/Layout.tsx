@@ -3,6 +3,7 @@ import { SideNavBar } from "./SideNavBar";
 import "../styles/layout.sass";
 import { CreatePool } from "../pages/CreatePool";
 import { ManagePool } from "../pages/MangagePool";
+import { ManageDetailedPool } from "../pages/ManageDetailedPool";
 
 export const Layout: React.FC = () => {
     return (
@@ -16,7 +17,7 @@ export const Layout: React.FC = () => {
                 {/*< Home/>*/}
                 {/*<CreatePool />*/}
                 {/*<ManagePool />*/}
-                <ManagePool />
+                <ManageDetailedPool />
 
             </div>
         </div>
