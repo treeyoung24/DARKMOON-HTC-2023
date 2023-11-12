@@ -25,9 +25,10 @@ export function CreatePool() {
                 arrivalTime: "2023-11-15T15:01:23.045123456Z",
             }
 
-            // postPool(dto).then((res) => {
-            //     console.log(res);
-            // })
+            postPool(dto).then((res) => {
+                console.log(res);
+                console.log("Success")
+            })
 
         }, [])
     return (
