@@ -9,6 +9,12 @@ using Backend.Models;
 using Learning.Models;
 using Backend.Models.DTO;
 using Humanizer;
+using System.Net.Http.Headers;
+using System.Security.Policy;
+using System.Text;
+using Newtonsoft.Json;
+using NuGet.Protocol;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Backend.Controllers
 {
@@ -98,6 +104,51 @@ namespace Backend.Controllers
         {
             (Pool obj, Driver dr) = dtoToPool(dto);
 
+            //Get user so we can get driver address
+            User user = await _context.Users.FindAsync(dr.DriverId);
+
+            // prepare request
+            var client = new HttpClient();
+            String url = "https://routes.googleapis.com/directions/v2:computeRoutes?key=" + Environment.GetEnvironmentVariable("API_KEY");
+            HttpRequestMessage httpRequest = new HttpRequestMessage(HttpMethod.Post, url);
+            var routeRequest = new
+            {
+                origin = new { address = user.Address, sideOfRoad = true },
+                destination = new { address = obj.Destination },
+                //intermediates = new[] { new { address = "Aldred Centre, CA416, 1301 Trans-Canada Hwy, Calgary, AB T2M 4W7" } },
+                travelMode = "DRIVE",
+                routingPreference = "TRAFFIC_AWARE_OPTIMAL",
+                arrivalTime = obj.ArrivalTime.ToString(),
+                computeAlternativeRoutes = false,
+                routeModifiers = new { vehicleInfo = new { emissionType = "GASOLINE" } },
+                languageCode = "en-US",
+                units = "IMPERIAL"
+            };
+            httpRequest.Content = new StringContent(
+                JsonConvert.SerializeObject(routeRequest), Encoding.UTF8, "application/json");
+            httpRequest.Headers.Add("X-Goog-FieldMask",
+                "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline,routes.legs.duration");
+            var response = await client.SendAsync(httpRequest);
+
+            //create route from request
+            Random random = new Random();
+            // Generate a random 8-digit number
+            dynamic item = JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync());
+            // Generate Route
+            int duration = Int32.Parse(
+                item.routes[0].duration.ToString().Remove(item.routes[0].duration.ToString().Length - 1)
+                );
+            Routes newRoute = new Routes
+            {
+                RouteId = random.Next(10000000, 99999999),
+                Distance = item.routes[0].distanceMeters,
+                Duration = duration,
+                Polylines = item.routes[0].polyline.encodedPolyline
+            };
+            // Add Route
+            _context.Routes.Add(newRoute);
+            await _context.SaveChangesAsync();
+            
             // Add pool
             _context.Pool.Add(obj);
             await _context.SaveChangesAsync();
@@ -105,8 +156,6 @@ namespace Backend.Controllers
             // Add driver
             _context.Driver.Add(dr);
             await _context.SaveChangesAsync();
-
-            // Generate Route
 
             return CreatedAtAction("GetPool", new { id = obj.PoolId }, obj);
         }
