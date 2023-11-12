@@ -4,6 +4,7 @@ import "../styles/layout.sass";
 import { CreatePool } from "../pages/CreatePool";
 import { ManagePool } from "../pages/MangagePool";
 import { ManageDetailedPool } from "../pages/ManageDetailedPool";
+import { Route, Routes } from "react-router-dom";
 
 export const Layout: React.FC = () => {
     return (
@@ -13,12 +14,12 @@ export const Layout: React.FC = () => {
 
             {/* Main Content Area */}
             <div className="main">
-                {/* Placeholder for your components */}
-                {/*< Home/>*/}
-                {/*<CreatePool />*/}
-                {/*<ManagePool />*/}
-                <ManageDetailedPool />
-
+                <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="/home" element={<Home />} />
+                    <Route path="/create-pool" element={<CreatePool />} />
+                    <Route path="/manage-pool" element={<ManagePool />} />
+                </Routes>
             </div>
         </div>
     );

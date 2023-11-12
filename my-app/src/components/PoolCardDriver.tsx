@@ -1,7 +1,9 @@
 import { Button } from "./Button";
 import "../styles/component.sass";
+import { useNavigate } from "react-router-dom";
 
 interface PoolCardProps {
+    id: string;
     startingTime: string;
     pickupLocation: string;
     arrivalTime: string;
@@ -10,8 +12,8 @@ interface PoolCardProps {
     totalEarn: number;
 }
 
-
 export function PoolCardDriver(props: PoolCardProps) {
+     const navigate = useNavigate();
     return (
         <div className="pool-card">
             <div className="time">
@@ -31,7 +33,7 @@ export function PoolCardDriver(props: PoolCardProps) {
                 <p>${props.totalEarn}</p>
             </div>
             <div className="button-container">
-                <Button type="contained" className="button-form" onClick={() => console.log('Create Pool clicked')}>Edit Pool</Button>
+                <Button type="contained" className="button-form" onClick={() => navigate(`/manage-pool/${props.id}`)}>Edit Pool</Button>
                 <Button type="contained" className="button-form" onClick={() => console.log('Create Pool clicked')}>Lock Pool</Button>
             </div>
         </div>

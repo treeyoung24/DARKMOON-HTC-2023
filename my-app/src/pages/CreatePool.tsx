@@ -4,8 +4,23 @@ import "../styles/component.sass";
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { useEffect } from "react";
+import { PoolDTO } from "../api/dtos/pool.dto";
+import { postPool } from "../api/services/pool.service";
 
 export function CreatePool() {
+    useEffect(() => {
+            const dto:PoolDTO = {
+                HostId: 1,
+                StartPoint: "123",
+                PoolSize: 1,
+                Destination: "123",
+                ArrivalTime: "11:00",
+            }
+
+            postPool(dto).then((res) => {
+                console.log(res);
+            })}, [])
     return (
         <div className="home">
             <div className="form">

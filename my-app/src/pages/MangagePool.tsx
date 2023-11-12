@@ -7,9 +7,9 @@ export function ManagePool() {
             <div className="flex flex-col justify-center">
                 <p className="text-md mb-2">My Pool</p>
                 <div className="container">
-                    <PoolCardDriver startingTime="10:00" pickupLocation="1234" arrivalTime="11:00" poolSize={4} availableSlot={2} totalEarn={10} />
-                    <PoolCardDriver startingTime="10:00" pickupLocation="1234" arrivalTime="11:00" poolSize={4} availableSlot={2} totalEarn={10} />
-                    <PoolCardDriver startingTime="10:00" pickupLocation="1234" arrivalTime="11:00" poolSize={4} availableSlot={2} totalEarn={10} />
+                    <PoolCardDriver id="1" startingTime="10:00" pickupLocation="1234" arrivalTime="11:00" poolSize={4} availableSlot={2} totalEarn={10} />
+                    <PoolCardDriver id="2" startingTime="10:00" pickupLocation="1234" arrivalTime="11:00" poolSize={4} availableSlot={2} totalEarn={10} />
+                    <PoolCardDriver id="3" startingTime="10:00" pickupLocation="1234" arrivalTime="11:00" poolSize={4} availableSlot={2} totalEarn={10} />
                 </div>
             </div>
             <div className="flex flex-col justify-center">
