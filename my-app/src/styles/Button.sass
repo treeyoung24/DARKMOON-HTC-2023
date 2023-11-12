@@ -1,0 +1,31 @@
+@import "utils/utils.sass"
+
+.button-action
+  @apply flex items-center justify-center
+  @apply shadow rounded-md m-3 px-2
+  @apply text-center whitespace-nowrap
+  height: $button-height-secondary
+  padding: $component-base-padding
+  &--outlined
+    @apply border
+    background-color: none
+    border-color: $color-primary
+    &:hover
+      background-color: $color-primary
+  &--contained
+    @apply border
+    background-color: $color-secondary
+    border-color: $color-primary
+    &:hover
+      @apply filter brightness-105
+      // background-color: $color-secondary
+
+.button-nav
+  @apply w-[80%] h-16
+  @apply my-6
+
+.button-form
+  background-color: $color-purple
+  margin-left: 2.5rem!important
+  margin-right: 2.5rem!important
+  @apply w-24 text-white

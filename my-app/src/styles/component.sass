@@ -1,0 +1,69 @@
+@import "utils/utils.sass"
+
+.input
+  @apply rounded-md border-2 border-black text-slate-700 text-sm w-full h-9
+
+.form
+  @apply w-3/4 flex ml-[-10%] flex-col rounded-xl shadow-sm shadow-slate-600 py-10
+  background-color: $color-primary
+  p
+    font-size: 1.5rem
+
+.manage-pool
+  @apply flex flex-col
+  width: 90%
+  margin: auto
+  flex-direction: column
+  justify-content: space-around
+  height: 100vh
+  .container
+    position: relative
+    overflow: scroll
+    height: 40vh
+    @apply flex flex-col justify-start items-center pt-3
+    @apply border-2 rounded-xl
+    border-color: $color-primary
+    .pool-card
+      margin-left: 0
+      @apply my-3 py-1 h-24
+      .button-container
+        @apply flex flex-col justify-center items-center
+        .button-form
+          @apply my-1
+          white-space: normal
+
+.pool-card
+  @apply flex flex-row justify-between items-center rounded-xl shadow-sm shadow-slate-600 py-10
+  width: 80%
+  min-width: 40rem
+  padding-left: 2.5rem
+  margin-left: -10%
+  @apply shadow-md
+  background-color: $color-primary
+  div
+    @apply flex flex-col  items-center
+  .header
+    color: $color-purple
+    font-weight: bold
+    margin-bottom: 0.5rem
+
+.request-table
+  background: $color-primary
+  @apply flex flex-col justify-center items-center rounded-xl shadow-sm shadow-slate-600 p-8
+  height: 80%
+  margin-left: -10%
+
+  > p
+   @apply text-lg m-3
+
+  .pending, .accepted
+    @apply flex justify-start items-start w-full rounded-xl shadow-sm
+    background: $color-secondary
+    height: 40%
+    overflow: scroll
+    .pending-item, .accepted-item
+      @apply flex w-full justify-around items-center py-1 mx-1
+      p
+        @apply mx-3
+
+
