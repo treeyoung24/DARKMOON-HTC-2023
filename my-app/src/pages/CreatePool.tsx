@@ -6,7 +6,7 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { ChangeEvent, useEffect } from "react";
 import { PoolDTO } from "../api/dtos/pool.dto";
-import { postPool } from "../api/services/pool.service";
+import { getRegisterPool, getPoolDetail, postPool, getPendingRequests } from "../api/services/pool.service";
 import React from "react";
 import { ENDPOINTS } from "../api/services/pool.service";
 import { FieldChangeHandlerContext } from "@mui/x-date-pickers/internals";
@@ -18,26 +18,45 @@ export function CreatePool() {
     const [arrivalDate, setArrivalDate] = React.useState<string>("");
     const [hostId, setHostId] = React.useState<number>(0);
 
-        useEffect(() => {
-            const dto:PoolDTO = {
-                hostId: 1,
-                poolSize: 1,
-                destination: "588 Aero Dr NE #106, Calgary, AB T2E 7Y4",
-                arrivalTime: "2023-11-15T15:01:23.045123456Z",
-            }
+    useEffect(() => {
+        const dto: PoolDTO = {
+            hostId: 1,
+            poolSize: 1,
+            destination: "588 Aero Dr NE #106, Calgary, AB T2E 7Y4",
+            arrivalTime: "2023-11-15T15:01:23.045123456Z",
+        };
+    
+        postPool(dto).then((res) => {
+            console.log(res);
+            console.log("Success");
+        }).catch((error) => {
+            console.error(error);
+        });
+    
+        // getPoolDetail(10651550).then((res) => {
+        //     console.log(res);
+        //     console.log("Success");
+        // }).catch((error) => {
+        //     console.error(error);
+        // });
 
-            // postPool(dto, ENDPOINTS.pool).then((res) => {
-            //     console.log(res);
-            //     console.log("Success")
-            // })
+        // getRegisterPool(2).then((res) => {
+        //     console.log(res);
+        //     console.log("Success");
+        // }).catch((error) => {
+        //     console.error(error);
+        // });
 
-            postPool(dto).then((res) => {
-                console.log(res);
-                console.log("Success");
-            }).catch((error) => {
-                console.error(error);
-            });
-        }, [])
+        getPendingRequests(59815183).then((res) => {
+            console.log(res);
+            console.log("Success");
+        }).catch((error) => {
+            console.error(error);
+        });
+    }, []);
+
+    
+    
     return (
         <div className="home">
             <div className="form">

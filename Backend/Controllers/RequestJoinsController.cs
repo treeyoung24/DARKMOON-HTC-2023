@@ -53,10 +53,10 @@ namespace Backend.Controllers
 
         // GET: api/RequestJoins/5
         [HttpGet("GetPassengerRequest")]
-        public async Task<ActionResult<IEnumerable<PoolPassengerMyView>>> GetPassengerRequest(int MemId)
+        public async Task<ActionResult<IEnumerable<PoolPassengerMyView>>> GetPassengerRequest(int Id)
         {
             var temp = await _context.RequestJoin
-               .Where(x => x.MemId == MemId).ToListAsync();
+               .Where(x => x.MemId == Id).ToListAsync();
 
             if (temp == null)
             {
@@ -71,7 +71,7 @@ namespace Backend.Controllers
                 Pool pool = await _context.Pool.FindAsync(temp2.PoolId);
                 if (pool != null)
                 {
-                    var pass = await _context.Passenger.Where(x => x.PoolId == pool.PoolId && x.PassengerId != MemId).ToListAsync();
+                    var pass = await _context.Passenger.Where(x => x.PoolId == pool.PoolId && x.PassengerId != Id).ToListAsync();
 
                     temp2.ArrivalTime = pool.ArrivalTime;
                     temp2.Stops = pass.Count;
