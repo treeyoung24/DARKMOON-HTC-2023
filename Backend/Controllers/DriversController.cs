@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Backend.Models.DTO;
+using Backend.Models;
 using Learning.Models;
 
 namespace Backend.Controllers

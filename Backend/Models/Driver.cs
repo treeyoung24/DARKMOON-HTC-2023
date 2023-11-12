@@ -1,4 +1,4 @@
-﻿namespace Backend.Models.DTO
+﻿namespace Backend.Models
 {
     public class Driver
     {

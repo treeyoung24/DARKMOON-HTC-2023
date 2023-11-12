@@ -16,7 +16,7 @@ namespace Backend.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.2");
 
-            modelBuilder.Entity("Backend.Models.DTO.Driver", b =>
+            modelBuilder.Entity("Backend.Models.Driver", b =>
                 {
                     b.Property<int>("DriverId")
                         .ValueGeneratedOnAdd()
