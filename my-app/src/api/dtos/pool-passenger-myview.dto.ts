@@ -1,4 +1,4 @@
-export interface PoolPassengerMyViewDTO {
+export interface PoolPassengerMyViewDTOReturn {
   poolId: number;
   pickupTime: string;
   arrivalTime: string;

@@ -1,21 +1,31 @@
-import { PoolCardPassenger } from "../components/PoolCardPassenger";
-import { PoolCardDriver } from "../components/PoolCardDriver";
+import { PoolCardPassenger, PoolCardPassengerProps } from "../components/PoolCardPassenger";
+import { PoolCardDriver, PoolCardDriverProps } from "../components/PoolCardDriver";
+import React from "react";
+import { paste } from "@testing-library/user-event/dist/paste";
+
 
 export function ManagePool() {
+    const [drivers, setDrivers] = React.useState<PoolCardDriverProps[]>([]);
+    const [passengers, setPassengers] = React.useState<PoolCardPassengerProps[]>([]);
+
     return (
         <div className="manage-pool">
             <div className="flex flex-col justify-center">
                 <p className="text-md mb-2">My Pool</p>
                 <div className="container">
-                    <PoolCardDriver id="1" startingTime="10:00" pickupLocation="1234" arrivalTime="11:00" poolSize={4} availableSlot={2} totalEarn={10} />
-                    <PoolCardDriver id="2" startingTime="10:00" pickupLocation="1234" arrivalTime="11:00" poolSize={4} availableSlot={2} totalEarn={10} />
-                    <PoolCardDriver id="3" startingTime="10:00" pickupLocation="1234" arrivalTime="11:00" poolSize={4} availableSlot={2} totalEarn={10} />
+                    {
+                        drivers?.map((driver: PoolCardDriverProps) => {
+                            return <PoolCardDriver id={driver.id} startingTime={driver.startingTime} pickupLocation={driver.pickupLocation} arrivalTime={driver.arrivalTime} poolSize={driver.poolSize} availableSlot={driver.availableSlot} totalEarn={driver.totalEarn} />
+                        })}
                 </div>
             </div>
             <div className="flex flex-col justify-center">
                 <p className="text-md mb-2">Request Pool</p>
                 <div className="container">
-                    <PoolCardPassenger pickupTime="10:00" pickupLocation="1234" arrivalTime="11:00" co2Emmission={100} numStop={2} fees={10} />
+                    {
+                        passengers?.map((passenger: PoolCardPassengerProps) => {
+                            return <PoolCardPassenger pickupTime={passenger.pickupTime} pickupLocation={passenger.pickupLocation} arrivalTime={passenger.arrivalTime} co2Emmission={passenger.co2Emmission} numStop={passenger.numStop} fees={passenger.fees} />
+                        })}
                 </div>
             </div>
 

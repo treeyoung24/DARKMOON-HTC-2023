@@ -1,4 +1,11 @@
 export interface RequestDTO {
   poolId: number;
-  passengerId: number;
+  memId: number;
+}
+
+export interface RequestDTOReturn {
+    poolId: number;
+    memId: number;
+    pickupTime: string;
+    routeId: number;
 }

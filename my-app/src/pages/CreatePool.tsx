@@ -10,6 +10,7 @@ import { postPool } from "../api/services/pool.service";
 import React from "react";
 import { ENDPOINTS } from "../api/services/pool.service";
 import { FieldChangeHandlerContext } from "@mui/x-date-pickers/internals";
+import { useNavigate } from "react-router-dom";
 
 export function CreatePool() {
     const [destination, setDestination] = React.useState<string>("");
@@ -17,6 +18,8 @@ export function CreatePool() {
     const [arrivalTime, setArrivalTime] = React.useState<string>("");
     const [arrivalDate, setArrivalDate] = React.useState<string>("");
     const [hostId, setHostId] = React.useState<number>(0);
+
+    const navigate = useNavigate();
 
         useEffect(() => {
             const dto:PoolDTO = {
@@ -34,6 +37,7 @@ export function CreatePool() {
             postPool(ENDPOINTS.pool, dto).then((res) => {
                 console.log(res);
                 console.log("Success");
+                navigate(`/manage-pool/${res.data.poolId}`, { replace: true });
             }).catch((error) => {
                 console.error(error);
             });

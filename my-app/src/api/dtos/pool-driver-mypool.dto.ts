@@ -1,4 +1,4 @@
-export interface PoolDriverMyPoolDTO {
+export interface PoolDriverMyPoolDTOReturn {
   startTime: string;
   arrivalTime: string;
   poolSize: number;

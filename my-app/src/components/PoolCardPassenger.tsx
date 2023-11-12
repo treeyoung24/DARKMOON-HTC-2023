@@ -1,7 +1,7 @@
 import { Button } from "./Button";
 import "../styles/component.sass";
 
-interface PoolCardProps {
+export interface PoolCardPassengerProps {
     pickupTime: string;
     pickupLocation: string;
     arrivalTime: string;
@@ -11,7 +11,7 @@ interface PoolCardProps {
 }
 
 
-export function PoolCardPassenger(props: PoolCardProps) {
+export function PoolCardPassenger(props: PoolCardPassengerProps) {
     return (
         <div className="pool-card">
             <div className="time">

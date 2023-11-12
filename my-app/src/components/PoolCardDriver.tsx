@@ -2,7 +2,7 @@ import { Button } from "./Button";
 import "../styles/component.sass";
 import { useNavigate } from "react-router-dom";
 
-interface PoolCardProps {
+export interface PoolCardDriverProps {
     id: string;
     startingTime: string;
     pickupLocation: string;
@@ -12,7 +12,7 @@ interface PoolCardProps {
     totalEarn: number;
 }
 
-export function PoolCardDriver(props: PoolCardProps) {
+export function PoolCardDriver(props: PoolCardDriverProps) {
      const navigate = useNavigate();
     return (
         <div className="pool-card">

@@ -1,4 +1,4 @@
-export interface PoolViewDTO {
+export interface PoolViewDTOReturn {
   poolId: number;
   poolSize: number;
   arrivalTime: string;
