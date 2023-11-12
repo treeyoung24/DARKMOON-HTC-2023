@@ -2,11 +2,23 @@ import { PoolCardPassenger, PoolCardPassengerProps } from "../components/PoolCar
 import { PoolCardDriver, PoolCardDriverProps } from "../components/PoolCardDriver";
 import React from "react";
 import { paste } from "@testing-library/user-event/dist/paste";
+import { getMyPool } from "../api/services/pool.service";
+import { PoolDriverMyPoolDTOReturn } from "../api/dtos/pool-driver-mypool.dto";
 
 
 export function ManagePool() {
-    const [drivers, setDrivers] = React.useState<PoolCardDriverProps[]>([]);
+    const [drivers, setDrivers] = React.useState<PoolDriverMyPoolDTOReturn[]>([]);
     const [passengers, setPassengers] = React.useState<PoolCardPassengerProps[]>([]);
+
+    React.useEffect(() => {
+        getMyPool(1).then((res) => {
+            setDrivers(drivers => ({ ...drivers, drivers: res.data }));
+
+        }).catch((error) => {
+            console.error(error);
+        }
+        )
+    }, []);
 
     return (
         <div className="manage-pool">
@@ -14,8 +26,8 @@ export function ManagePool() {
                 <p className="text-md mb-2">My Pool</p>
                 <div className="container">
                     {
-                        drivers?.map((driver: PoolCardDriverProps) => {
-                            return <PoolCardDriver id={driver.id} startingTime={driver.startingTime} pickupLocation={driver.pickupLocation} arrivalTime={driver.arrivalTime} poolSize={driver.poolSize} availableSlot={driver.availableSlot} totalEarn={driver.totalEarn} />
+                        drivers?.map((driver: PoolDriverMyPoolDTOReturn) => {
+                            return <PoolCardDriver id={`${driver.poolId}`} startingTime={driver.startTime} pickupLocation={driver.destination} arrivalTime={driver.arrivalTime} poolSize={driver.poolSize} availableSlot={driver.availableSlots} totalEarn={driver.totalEarnings} />
                         })}
                 </div>
             </div>

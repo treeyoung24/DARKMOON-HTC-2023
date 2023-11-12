@@ -6,8 +6,19 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { RequestTable } from "../components/RequestTable";
 import { DriverMap } from "./DriverMap";
+import { useParams } from "react-router-dom";
+import { getPoolDetail } from "../api/services/pool.service";
+import { useEffect } from "react";
 
 export function ManageDetailedPool() {
+    const {poolId} = useParams();
+
+    useEffect(() => {
+        getPoolDetail(Number(poolId)).then((res) => {
+            console.log(res.data);})}
+
+            , [poolId]);
+
     return (
         <div>
             <div className="manage-home">
