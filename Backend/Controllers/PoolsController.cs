@@ -81,6 +81,7 @@ namespace Backend.Controllers
                 var pass = await _context.Passenger.Where(x => x.PoolId == p.PoolId).ToListAsync();
                 dp.AvailableSlot = dp.PoolSize - pass.Count();
                 dp.TotalEarn = pass.Count() * 3.25f;
+                // START TIME TODO
                 listPools.Add(dp);
             }
 
@@ -106,6 +107,7 @@ namespace Backend.Controllers
                 var pool = await _context.Pool.FindAsync(t.PoolId);
                 if (pool != null)
                 {
+                    // PICKUP TIME TODO
                     pools.Add(PoolToPassengerView(pool));
                 }
             }
