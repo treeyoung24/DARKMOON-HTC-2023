@@ -78,6 +78,9 @@ namespace Backend.Controllers
             foreach(Pool p in temp)
             {
                 PoolDriverMyPool dp = PoolToDiverPool(p);
+                var pass = await _context.Passenger.Where(x => x.PoolId == p.PoolId).ToListAsync();
+                dp.AvailableSlot = dp.PoolSize - pass.Count();
+                dp.TotalEarn = pass.Count() * 3.25f;
                 listPools.Add(dp);
             }
 
@@ -272,7 +275,7 @@ namespace Backend.Controllers
                 PoolId = pool.PoolId,
                 PoolSize = pool.PoolSize,
                 Destination = pool.Destination,
-
+                // TODO START TIME
 
             };
 
