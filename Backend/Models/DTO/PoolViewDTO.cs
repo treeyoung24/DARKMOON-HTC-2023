@@ -1,7 +1,8 @@
 ﻿namespace Backend.Models.DTO
 {
-    public class PoolReturnDTO
+    public class PoolViewDTO
     {
+        public int PoolId { get; set; }
         public int PoolSize { get; set; }
         public string ArrivalTime { get; set; }
         public string Destination { get; set; }

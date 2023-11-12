@@ -33,6 +33,12 @@ namespace Learning.Models
                 .HasKey(rj => new { rj.PoolId, rj.MemId
             });
 
+            modelBuilder.Entity<JoinedPoll>()
+                .HasKey(rj => new {
+                    rj.PoolId,
+                    rj.MemId
+                });
+
             modelBuilder.Entity<RouteOrder>()
                 .HasKey(rj => new {
                     rj.Order,
@@ -53,6 +59,10 @@ namespace Learning.Models
                 });
 
         }
+
+
+
+        public DbSet<Backend.Models.JoinedPoll> JoinedPoll { get; set; }
 
 
     }

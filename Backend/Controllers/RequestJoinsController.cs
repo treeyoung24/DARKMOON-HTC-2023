@@ -116,7 +116,8 @@ namespace Backend.Controllers
             {
                 return NotFound();
             }
-            _context.Passenger.Add(requestToPassenger(requestJoin));
+            _context.Passenger.Add(requestToPassenger(requestJoin));            // Add passenger
+            _context.JoinedPoll.Add(RequestPollToJoinedPoll(requestJoin));      // Add JoinedPoll
             _context.RequestJoin.Remove(temp);
             await _context.SaveChangesAsync();
 
@@ -173,6 +174,19 @@ namespace Backend.Controllers
             };
 
             return passenger;
+        }
+
+        private JoinedPoll RequestPollToJoinedPoll(RequestJoin requestJoin)
+        {
+            JoinedPoll joined = new JoinedPoll
+            {
+                MemId = requestJoin.MemId,
+                PoolId = requestJoin.PoolId,
+                PickupTime = requestJoin.PickupTime,
+                RouteId = requestJoin.RouteId,
+            };
+
+            return joined;
         }
 
         private async void UpdatePool(RequestJoin request)

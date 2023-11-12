@@ -31,8 +31,9 @@ namespace Backend.Controllers
         }
 
         // GET: api/Pools/5
+        // VIEW POLL BY ID
         [HttpGet("{id}")]
-        public async Task<ActionResult<PoolReturnDTO>> GetPool(int id)
+        public async Task<ActionResult<PoolViewDTO>> GetPool(int id)
         {
             var pool = await _context.Pool.FindAsync(id);
 
@@ -42,27 +43,27 @@ namespace Backend.Controllers
             }
 
             User user = await _context.Users.FindAsync(pool.HostId);
-            PoolReturnDTO dto = PoolToReturnAsync(pool);
+            PoolViewDTO dto = PoolToViewPool(pool);
             dto.StartingPoint = user.Address;
 
             return dto;
         }
 
         // GET: api/Pools/5
-        [HttpGet("GetAllUserPools")]
-        public async Task<ActionResult<IEnumerable<Pool>>> GetAllUserPools(int id)
-        {
-            var driver = await GetDriverPools(id);
-            var passenger = await GetPassengerPools(id);
+        //[HttpGet("GetAllUserPools")]
+        //public async Task<ActionResult<IEnumerable<Pool>>> GetAllUserPools(int id)
+        //{
+            //var driver = await GetDriverPools(id);
+            //var passenger = await GetPassengerPools(id);
 
-            var combinedPools = driver.Value.Concat(passenger.Value);
+            //var combinedPools = driver.Value.Concat(passenger.Value);
 
-            return Ok(combinedPools);
-        }
+            //return Ok(combinedPools);
+        //}
 
         //GET: api/Pools/5
         [HttpGet("GetDriverPools")]
-        public async Task<ActionResult<IEnumerable<Pool>>> GetDriverPools(int id)
+        public async Task<ActionResult<IEnumerable<PoolDriverMyPool>>> GetDriverPools(int id)
         {
             var temp = await _context.Pool
                .Where(x => x.HostId == id).ToListAsync();
@@ -72,12 +73,20 @@ namespace Backend.Controllers
                 return NotFound();
             }
 
-            return temp;
+            List<PoolDriverMyPool> listPools = new List<PoolDriverMyPool> ();
+
+            foreach(Pool p in temp)
+            {
+                PoolDriverMyPool dp = PoolToDiverPool(p);
+                listPools.Add(dp);
+            }
+
+            return listPools;
         }
 
         //GET: api/Pools/5
         [HttpGet("GetPassengerPools")]
-        public async Task<ActionResult<IEnumerable<Pool>>> GetPassengerPools(int id)
+        public async Task<ActionResult<IEnumerable<PoolPassengerMyView>>> GetPassengerPools(int id)
         {
             var passenger = await _context.Passenger
                .Where(x => x.PassengerId == id).ToListAsync(); 
@@ -88,13 +97,13 @@ namespace Backend.Controllers
             }
 
             
-            List<Pool> pools = new List<Pool>();
+            List<PoolPassengerMyView> pools = new List<PoolPassengerMyView>();
             foreach (var t in passenger) // Specify the type of 't'
             {
                 var pool = await _context.Pool.FindAsync(t.PoolId);
                 if (pool != null)
                 {
-                    pools.Add(pool);
+                    pools.Add(PoolToPassengerView(pool));
                 }
             }
 
@@ -239,12 +248,13 @@ namespace Backend.Controllers
             return (obj, dr);
         }
 
-        private PoolReturnDTO PoolToReturnAsync(Pool pool)
+        private PoolViewDTO PoolToViewPool(Pool pool)
         {
             
 
-            PoolReturnDTO result = new PoolReturnDTO
+            PoolViewDTO result = new PoolViewDTO
             {
+                PoolId = pool.PoolId,
                 PoolSize = pool.PoolSize,
                 ArrivalTime = pool.ArrivalTime,
                 Destination = pool.Destination,
@@ -252,6 +262,34 @@ namespace Backend.Controllers
             };
 
             return result;
+        }
+
+        private PoolDriverMyPool PoolToDiverPool(Pool pool)
+        {
+            PoolDriverMyPool driverPool = new PoolDriverMyPool
+            {
+                ArrivalTime = pool.ArrivalTime,
+                PoolId = pool.PoolId,
+                PoolSize = pool.PoolSize,
+                Destination = pool.Destination,
+
+
+            };
+
+            return driverPool;
+        }
+
+        private PoolPassengerMyView PoolToPassengerView(Pool pool)
+        {
+            PoolPassengerMyView passPool = new PoolPassengerMyView
+            {
+                ArrivalTime = pool.ArrivalTime,
+                PoolId = pool.PoolId,
+                CO2 = 250,
+                Fee = 3.25f,
+            };
+
+            return passPool;
         }
 
     }
