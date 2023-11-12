@@ -25,10 +25,10 @@ export function ManageDetailedPool() {
     useEffect(() => {
         getPoolDetail(Number(poolId)).then((res) => {
             console.log(res.data);
-            setDestination(res.data.destination);
-            setPoolSize(res.data.poolSize);
-            setArrivalTime(res.data.arrivalTime);
-            setStartingPoint(res.data.startingPoint);
+            setDestination(res.destination);
+            setPoolSize(res.poolSize);
+            setArrivalTime(res.arrivalTime);
+            setStartingPoint(res.startingPoint);
         })
     }
         , [poolId]);

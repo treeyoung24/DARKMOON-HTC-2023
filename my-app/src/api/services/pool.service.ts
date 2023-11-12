@@ -20,8 +20,15 @@ interface ReturnDTO<T>{
 }
 
 const createApiRequestFunction = (method: string, endpointSuffix?: string) => {
-    return async ( data?: any): Promise<any> => {
+    return async (data?: any): Promise<any> => {
         try {
+            let url = rootUrl + endpointSuffix;
+
+            if (method === 'GET' && data) {
+                url = url + '?id=' + data;  // Modify this based on your endpoint structure
+                console.log(url);
+            }
+
             const requestOptions: RequestInit = {
                 method: method,
                 headers: {
@@ -30,8 +37,7 @@ const createApiRequestFunction = (method: string, endpointSuffix?: string) => {
                 body: method === 'POST' && data ? JSON.stringify(data) : undefined,
             };
 
-            if(method == 'GET') endpointSuffix = endpointSuffix + data;
-            const response = await fetch(rootUrl + endpointSuffix, requestOptions);
+            const response = await fetch(url, requestOptions);
 
             if (!response.ok) {
                 throw new Error(`Request failed. Status: ${response.status}`);
@@ -40,7 +46,7 @@ const createApiRequestFunction = (method: string, endpointSuffix?: string) => {
             const res = await response.json();
             return res;
         } catch (error) {
-            console.error(`Error making request to ${endpointSuffix}:`, error);
+            console.error(`Error making request to ${rootUrl + endpointSuffix}:`, error);
             throw error; // Rethrow the error to be caught by the caller
         }
     };
@@ -55,7 +61,7 @@ const createApiRequestFunction = (method: string, endpointSuffix?: string) => {
 export const postPool: (pool: PoolDTO) => Promise<any> = createApiRequestFunction('POST', ENDPOINTS.pool);
 
 // Get My Pool - Driver
-export const getMyPool: (id: number) => Promise<ReturnDTO<PoolDriverMyPoolDTOReturn[]>> = createApiRequestFunction('POST', ENDPOINTS.pool + 'GetDriverPools');
+export const getMyPool: (id: number) => Promise<ReturnDTO<PoolDriverMyPoolDTOReturn[]>> = createApiRequestFunction('GET', ENDPOINTS.pool + 'GetDriverPools');
 
 export const getPassengerPool: (passId: number) => Promise<ReturnDTO<PassengerDTOReturn[]>> = createApiRequestFunction('GET', ENDPOINTS.pool + 'GetPassengerPools');
 export const getPoolDetail: (poolId: number) => Promise<ReturnDTO<PoolViewDTOReturn>> = createApiRequestFunction('GET', ENDPOINTS.pool);

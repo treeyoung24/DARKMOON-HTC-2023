@@ -12,7 +12,9 @@ export function ManagePool() {
 
     React.useEffect(() => {
         getMyPool(1).then((res) => {
-            setDrivers(drivers => ({ ...drivers, drivers: res.data }));
+            console.log(res);
+            setDrivers(drivers => ([ ...drivers, ...res]));
+            console.log(drivers);
 
         }).catch((error) => {
             console.error(error);
@@ -26,7 +28,7 @@ export function ManagePool() {
                 <p className="text-md mb-2">My Pool</p>
                 <div className="container">
                     {
-                        drivers?.map((driver: PoolDriverMyPoolDTOReturn) => {
+                        drivers.map((driver: PoolDriverMyPoolDTOReturn) => {
                             return <PoolCardDriver id={`${driver.poolId}`} startingTime={driver.startTime} pickupLocation={driver.destination} arrivalTime={driver.arrivalTime} poolSize={driver.poolSize} availableSlot={driver.availableSlots} totalEarn={driver.totalEarnings} />
                         })}
                 </div>
