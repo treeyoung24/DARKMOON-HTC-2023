@@ -2,6 +2,7 @@
 using Learning.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(GeneralContext))]
-    partial class GeneralContextModelSnapshot : ModelSnapshot
+    [Migration("20231112052048_ModifyPool")]
+    partial class ModifyPool
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.2");
@@ -19,56 +22,33 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Models.Driver", b =>
                 {
                     b.Property<int>("PoolId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(0);
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("DriverId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(1);
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("StartTime")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("PoolId", "DriverId");
+                    b.HasKey("PoolId");
 
                     b.ToTable("Driver");
                 });
 
-            modelBuilder.Entity("Backend.Models.JoinedPoll", b =>
-                {
-                    b.Property<int>("PoolId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(0);
-
-                    b.Property<int>("MemId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(1);
-
-                    b.Property<string>("PickupTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("RouteId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("PoolId", "MemId");
-
-                    b.ToTable("JoinedPoll");
-                });
-
             modelBuilder.Entity("Backend.Models.Passenger", b =>
                 {
-                    b.Property<int>("PoolId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(0);
-
                     b.Property<int>("PassengerId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(1);
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("PickupTime")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("PoolId", "PassengerId");
+                    b.Property<int>("PoolId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("PassengerId");
 
                     b.ToTable("Passenger");
                 });
@@ -91,9 +71,6 @@ namespace Backend.Migrations
                     b.Property<int>("PoolSize")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("RouteId")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("PoolId");
 
                     b.ToTable("Pool");
@@ -102,12 +79,11 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Models.RequestJoin", b =>
                 {
                     b.Property<int>("PoolId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(0);
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("MemId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(1);
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("PickupTime")
                         .HasColumnType("TEXT");
@@ -115,7 +91,7 @@ namespace Backend.Migrations
                     b.Property<int>("RouteId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("PoolId", "MemId");
+                    b.HasKey("PoolId");
 
                     b.ToTable("RequestJoin");
                 });
@@ -123,18 +99,16 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Models.RouteOrder", b =>
                 {
                     b.Property<int>("Order")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(0);
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(1);
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("RouteId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(2);
+                        .HasColumnType("INTEGER");
 
-                    b.HasKey("Order", "UserId", "RouteId");
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Order");
 
                     b.ToTable("RouteOrder");
                 });

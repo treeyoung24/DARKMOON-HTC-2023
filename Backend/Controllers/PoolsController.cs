@@ -9,6 +9,12 @@ using Backend.Models;
 using Learning.Models;
 using Backend.Models.DTO;
 using Humanizer;
+using System.Net.Http.Headers;
+using System.Security.Policy;
+using System.Text;
+using Newtonsoft.Json;
+using NuGet.Protocol;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Backend.Controllers
 {
@@ -31,8 +37,9 @@ namespace Backend.Controllers
         }
 
         // GET: api/Pools/5
+        // VIEW POLL BY ID
         [HttpGet("{id}")]
-        public async Task<ActionResult<Pool>> GetPool(int id)
+        public async Task<ActionResult<PoolViewDTO>> GetPool(int id)
         {
             var pool = await _context.Pool.FindAsync(id);
 
@@ -41,7 +48,77 @@ namespace Backend.Controllers
                 return NotFound();
             }
 
-            return pool;
+            User user = await _context.Users.FindAsync(pool.HostId);
+            PoolViewDTO dto = PoolToViewPool(pool);
+            dto.StartingPoint = user.Address;
+
+            return dto;
+        }
+
+        // GET: api/Pools/5
+        //[HttpGet("GetAllUserPools")]
+        //public async Task<ActionResult<IEnumerable<Pool>>> GetAllUserPools(int id)
+        //{
+            //var driver = await GetDriverPools(id);
+            //var passenger = await GetPassengerPools(id);
+
+            //var combinedPools = driver.Value.Concat(passenger.Value);
+
+            //return Ok(combinedPools);
+        //}
+
+        //GET: api/Pools/5
+        [HttpGet("GetDriverPools")]
+        public async Task<ActionResult<IEnumerable<PoolDriverMyPool>>> GetDriverPools(int id)
+        {
+            var temp = await _context.Pool
+               .Where(x => x.HostId == id).ToListAsync();
+
+            if (temp == null)
+            {
+                return NotFound();
+            }
+
+            List<PoolDriverMyPool> listPools = new List<PoolDriverMyPool> ();
+
+            foreach(Pool p in temp)
+            {
+                PoolDriverMyPool dp = PoolToDiverPool(p);
+                var pass = await _context.Passenger.Where(x => x.PoolId == p.PoolId).ToListAsync();
+                dp.AvailableSlot = dp.PoolSize - pass.Count();
+                dp.TotalEarn = pass.Count() * 3.25f;
+                // START TIME TODO
+                listPools.Add(dp);
+            }
+
+            return listPools;
+        }
+
+        //GET: api/Pools/5
+        [HttpGet("GetPassengerPools")]
+        public async Task<ActionResult<IEnumerable<PoolPassengerMyView>>> GetPassengerPools(int id)
+        {
+            var passenger = await _context.Passenger
+               .Where(x => x.PassengerId == id).ToListAsync(); 
+
+            if (passenger.Count == 0 || passenger == null)
+            {
+                return NotFound();
+            }
+
+            
+            List<PoolPassengerMyView> pools = new List<PoolPassengerMyView>();
+            foreach (var t in passenger) // Specify the type of 't'
+            {
+                var pool = await _context.Pool.FindAsync(t.PoolId);
+                if (pool != null)
+                {
+                    // PICKUP TIME TODO
+                    pools.Add(PoolToPassengerView(pool));
+                }
+            }
+
+            return pools;
         }
 
         // PUT: api/Pools/5
@@ -83,15 +160,59 @@ namespace Backend.Controllers
         {
             (Pool obj, Driver dr) = dtoToPool(dto);
 
+            //Get user so we can get driver address
+            User user = await _context.Users.FindAsync(dr.DriverId);
+
+            // prepare request
+            var client = new HttpClient();
+            String url = "https://routes.googleapis.com/directions/v2:computeRoutes?key=" + Environment.GetEnvironmentVariable("API_KEY");
+            HttpRequestMessage httpRequest = new HttpRequestMessage(HttpMethod.Post, url);
+            var routeRequest = new
+            {
+                origin = new { address = user.Address, sideOfRoad = true },
+                destination = new { address = obj.Destination },
+                //intermediates = new[] { new { address = "Aldred Centre, CA416, 1301 Trans-Canada Hwy, Calgary, AB T2M 4W7" } },
+                travelMode = "DRIVE",
+                routingPreference = "TRAFFIC_AWARE_OPTIMAL",
+                arrivalTime = obj.ArrivalTime.ToString(),
+                computeAlternativeRoutes = false,
+                routeModifiers = new { vehicleInfo = new { emissionType = "GASOLINE" } },
+                languageCode = "en-US",
+                units = "IMPERIAL"
+            };
+            httpRequest.Content = new StringContent(
+                JsonConvert.SerializeObject(routeRequest), Encoding.UTF8, "application/json");
+            httpRequest.Headers.Add("X-Goog-FieldMask",
+                "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline,routes.legs.duration");
+            var response = await client.SendAsync(httpRequest);
+
+            //create route from request
+            Random random = new Random();
+            // Generate a random 8-digit number
+            dynamic item = JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync());
+            // Generate Route
+            int duration = Int32.Parse(
+                item.routes[0].duration.ToString().Remove(item.routes[0].duration.ToString().Length - 1)
+                );
+            Routes newRoute = new Routes
+            {
+                RouteId = random.Next(10000000, 99999999),
+                Distance = item.routes[0].distanceMeters,
+                Duration = duration,
+                Polylines = item.routes[0].polyline.encodedPolyline
+            };
+            // Add Route
+            _context.Routes.Add(newRoute);
+            await _context.SaveChangesAsync();
+            
             // Add pool
+            obj.RouteId = newRoute.RouteId;
             _context.Pool.Add(obj);
             await _context.SaveChangesAsync();
 
             // Add driver
             _context.Driver.Add(dr);
             await _context.SaveChangesAsync();
-
-            // Generate Route
 
             return CreatedAtAction("GetPool", new { id = obj.PoolId }, obj);
         }
@@ -170,6 +291,7 @@ namespace Backend.Controllers
             obj.ArrivalTime = dto.ArrivalTime;
             obj.Destination = dto.Destination;
             obj.HostId = dto.HostId;
+            obj.RouteId = 0;
 
             Driver dr = new Driver
             {
@@ -181,7 +303,49 @@ namespace Backend.Controllers
             return (obj, dr);
         }
 
-        
+        private PoolViewDTO PoolToViewPool(Pool pool)
+        {
+            
+
+            PoolViewDTO result = new PoolViewDTO
+            {
+                PoolId = pool.PoolId,
+                PoolSize = pool.PoolSize,
+                ArrivalTime = pool.ArrivalTime,
+                Destination = pool.Destination,
+                StartingPoint = ""
+            };
+
+            return result;
+        }
+
+        private PoolDriverMyPool PoolToDiverPool(Pool pool)
+        {
+            PoolDriverMyPool driverPool = new PoolDriverMyPool
+            {
+                ArrivalTime = pool.ArrivalTime,
+                PoolId = pool.PoolId,
+                PoolSize = pool.PoolSize,
+                Destination = pool.Destination,
+                // TODO START TIME
+
+            };
+
+            return driverPool;
+        }
+
+        private PoolPassengerMyView PoolToPassengerView(Pool pool)
+        {
+            PoolPassengerMyView passPool = new PoolPassengerMyView
+            {
+                ArrivalTime = pool.ArrivalTime,
+                PoolId = pool.PoolId,
+                CO2 = 250,
+                Fee = 3.25f,
+            };
+
+            return passPool;
+        }
 
     }
 

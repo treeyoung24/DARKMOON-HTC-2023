@@ -12,47 +12,47 @@ namespace Backend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class RouteOrdersController : ControllerBase
+    public class JoinedPollsController : ControllerBase
     {
         private readonly GeneralContext _context;
 
-        public RouteOrdersController(GeneralContext context)
+        public JoinedPollsController(GeneralContext context)
         {
             _context = context;
         }
 
-        // GET: api/RouteOrders
+        // GET: api/JoinedPolls
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RouteOrder>>> GetRouteOrder()
+        public async Task<ActionResult<IEnumerable<JoinedPoll>>> GetJoinedPoll()
         {
-            return await _context.RouteOrder.ToListAsync();
+            return await _context.JoinedPoll.ToListAsync();
         }
 
-        // GET: api/RouteOrders/5
+        // GET: api/JoinedPolls/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<RouteOrder>> GetRouteOrder(int id)
+        public async Task<ActionResult<JoinedPoll>> GetJoinedPoll(int id)
         {
-            var routeOrder = await _context.RouteOrder.FindAsync(id);
+            var joinedPoll = await _context.JoinedPoll.FindAsync(id);
 
-            if (routeOrder == null)
+            if (joinedPoll == null)
             {
                 return NotFound();
             }
 
-            return routeOrder;
+            return joinedPoll;
         }
 
-        // PUT: api/RouteOrders/5
+        // PUT: api/JoinedPolls/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutRouteOrder(int id, RouteOrder routeOrder)
+        public async Task<IActionResult> PutJoinedPoll(int id, JoinedPoll joinedPoll)
         {
-            if (id != routeOrder.Order)
+            if (id != joinedPoll.PoolId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(routeOrder).State = EntityState.Modified;
+            _context.Entry(joinedPoll).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +60,7 @@ namespace Backend.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!RouteOrderExists(id))
+                if (!JoinedPollExists(id))
                 {
                     return NotFound();
                 }
@@ -73,19 +73,19 @@ namespace Backend.Controllers
             return NoContent();
         }
 
-        // POST: api/RouteOrders
+        // POST: api/JoinedPolls
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<RouteOrder>> PostRouteOrder(RouteOrder routeOrder)
+        public async Task<ActionResult<JoinedPoll>> PostJoinedPoll(JoinedPoll joinedPoll)
         {
-            _context.RouteOrder.Add(routeOrder);
+            _context.JoinedPoll.Add(joinedPoll);
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
             {
-                if (RouteOrderExists(routeOrder.Order))
+                if (JoinedPollExists(joinedPoll.PoolId))
                 {
                     return Conflict();
                 }
@@ -95,28 +95,28 @@ namespace Backend.Controllers
                 }
             }
 
-            return CreatedAtAction("GetRouteOrder", new { id = routeOrder.Order }, routeOrder);
+            return CreatedAtAction("GetJoinedPoll", new { id = joinedPoll.PoolId }, joinedPoll);
         }
 
-        // DELETE: api/RouteOrders/5
+        // DELETE: api/JoinedPolls/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRouteOrder(int id)
+        public async Task<IActionResult> DeleteJoinedPoll(int id)
         {
-            var routeOrder = await _context.RouteOrder.FindAsync(id);
-            if (routeOrder == null)
+            var joinedPoll = await _context.JoinedPoll.FindAsync(id);
+            if (joinedPoll == null)
             {
                 return NotFound();
             }
 
-            _context.RouteOrder.Remove(routeOrder);
+            _context.JoinedPoll.Remove(joinedPoll);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool RouteOrderExists(int id)
+        private bool JoinedPollExists(int id)
         {
-            return _context.RouteOrder.Any(e => e.Order == id);
+            return _context.JoinedPoll.Any(e => e.PoolId == id);
         }
     }
 }

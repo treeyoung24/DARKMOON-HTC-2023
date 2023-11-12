@@ -2,6 +2,7 @@
 using Learning.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Backend.Migrations
 {
     [DbContext(typeof(GeneralContext))]
-    partial class GeneralContextModelSnapshot : ModelSnapshot
+    [Migration("20231112072722_AddMultipleKeys3")]
+    partial class AddMultipleKeys3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.2");
@@ -32,27 +35,6 @@ namespace Backend.Migrations
                     b.HasKey("PoolId", "DriverId");
 
                     b.ToTable("Driver");
-                });
-
-            modelBuilder.Entity("Backend.Models.JoinedPoll", b =>
-                {
-                    b.Property<int>("PoolId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(0);
-
-                    b.Property<int>("MemId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnOrder(1);
-
-                    b.Property<string>("PickupTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("RouteId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("PoolId", "MemId");
-
-                    b.ToTable("JoinedPoll");
                 });
 
             modelBuilder.Entity("Backend.Models.Passenger", b =>

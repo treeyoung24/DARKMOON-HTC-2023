@@ -7,6 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Backend.Models;
 using Learning.Models;
+using Backend.Models.DTO;
+using Humanizer;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Net;
+using Newtonsoft.Json;
+using System.Text;
+using static System.Net.Mime.MediaTypeNames;
+using System.Globalization;
 
 namespace Backend.Controllers
 {
@@ -29,17 +37,47 @@ namespace Backend.Controllers
         }
 
         // GET: api/RequestJoins/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<RequestJoin>> GetRequestJoin(int id)
+        [HttpGet("GetSingleRequest")]
+        public async Task<ActionResult<IEnumerable<RequestJoin>>> GetSingleRequest(int id, int MemId)
         {
-            var requestJoin = await _context.RequestJoin.FindAsync(id);
+            var temp = await _context.RequestJoin
+               .Where(x => x.PoolId == id && x.MemId == MemId).ToListAsync();
 
-            if (requestJoin == null)
+            if (temp == null)
             {
                 return NotFound();
             }
 
-            return requestJoin;
+            return temp;
+        }
+
+        // GET: api/RequestJoins/5
+        [HttpGet("GetPassengerRequest")]
+        public async Task<ActionResult<IEnumerable<RequestJoin>>> GetPassengerRequest(int MemId)
+        {
+            var temp = await _context.RequestJoin
+               .Where(x => x.MemId == MemId).ToListAsync();
+
+            if (temp == null)
+            {
+                return NotFound();
+            }
+
+            return temp;
+        }
+
+        // GET: api/RequestJoins/5
+        [HttpGet("GetAllPendingRequest")]
+        public async Task<ActionResult<IEnumerable<RequestJoin>>> GetAllPendingRequest(int id)
+        {
+            var temp = await _context.RequestJoin
+               .Where(x => x.PoolId == id).ToListAsync();
+            if (temp == null)
+            {
+                return NotFound();
+            }
+
+            return temp;
         }
 
         // PUT: api/RequestJoins/5
@@ -74,27 +112,217 @@ namespace Backend.Controllers
         }
 
         // POST: api/RequestJoins
+        // ADD REQUEST JOIN
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<RequestJoin>> PostRequestJoin(RequestJoin requestJoin)
+        public async Task<ActionResult<RequestJoin>> PostRequestJoin(RequestDTO dto)
         {
-            _context.RequestJoin.Add(requestJoin);
+
+            RequestJoin obj = dtoToRequest(dto);
+
+            List<Passenger> passengerList = await _context.Passenger
+               .Where(x => x.PoolId == dto.PoolId).ToListAsync();
+
+            List<String> addressList = new List<string>();
+            foreach(Passenger p in  passengerList)
+            {
+                addressList.Add((await _context.Users.FindAsync(p.PassengerId)).Address);
+            }
+            String startPoint = await getStartAddressFromPoolId(obj.PoolId);
+            Pool pool = await _context.Pool.FindAsync(obj.PoolId);
+            int minInt = 0;
+            HttpResponseMessage savedResponse= null;
+            int recordedI = 0;
+            for (int i = 0; i < passengerList.Count; i++)
+            {
+                Console.WriteLine(0);
+                List<String> aList = new List<String>(addressList);
+                aList.Insert(i, (await _context.Users.FindAsync(obj.MemId)).Address);
+                var addressJsonList = aList.Select(x => new { address = x }).ToArray();
+                // prepare request
+                var client = new HttpClient();
+                String url = "https://routes.googleapis.com/directions/v2:computeRoutes?key=" + Environment.GetEnvironmentVariable("API_KEY");
+                HttpRequestMessage httpRequest = new HttpRequestMessage(HttpMethod.Post, url);
+                var routeRequest = new
+                {
+                    origin = new { address = startPoint, sideOfRoad = true },
+                    destination = new { address = pool.Destination },
+                    intermediates = addressJsonList,
+                    travelMode = "DRIVE",
+                    routingPreference = "TRAFFIC_AWARE_OPTIMAL",
+                    arrivalTime = pool.ArrivalTime,
+                    computeAlternativeRoutes = false,
+                    routeModifiers = new { vehicleInfo = new { emissionType = "GASOLINE" } },
+                    languageCode = "en-US",
+                    units = "IMPERIAL"
+                };
+
+                //Console.Write(JsonConvert.SerializeObject(routeRequest));
+                //Console.Write("\n");
+
+                httpRequest.Content = new StringContent(
+                    JsonConvert.SerializeObject(routeRequest), Encoding.UTF8, "application/json");
+                httpRequest.Headers.Add("X-Goog-FieldMask",
+                    "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline,routes.legs.duration");
+                HttpResponseMessage response = await client.SendAsync(httpRequest);
+                dynamic item = JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync());
+                // Generate Route
+                int duration = Int32.Parse(
+                    item.routes[0].duration.ToString().Remove(item.routes[0].duration.ToString().Length - 1)
+                    );
+
+
+                if(i == 0)
+                {
+                    savedResponse = response; ;
+                    minInt = duration;
+                    recordedI = i;
+                    Console.WriteLine(1);
+                }
+                if(minInt < duration)
+                {
+                    savedResponse = response; ;
+                    minInt = duration;
+                    recordedI = i;
+                    Console.WriteLine(2);
+                }
+            }
+            if(addressList.Count == 0)
+            {
+                List<String> aList = new List<String>();
+
+                aList.Add((await _context.Users.FindAsync(obj.MemId)).Address);
+                var addressJsonList = aList.Select(x => new { address = x }).ToArray();
+                // prepare request
+                var client = new HttpClient();
+                String url = "https://routes.googleapis.com/directions/v2:computeRoutes?key=" + Environment.GetEnvironmentVariable("API_KEY");
+                HttpRequestMessage httpRequest = new HttpRequestMessage(HttpMethod.Post, url);
+                var routeRequest = new
+                {
+                    origin = new { address = startPoint, sideOfRoad = true },
+                    destination = new { address = pool.Destination },
+                    intermediates = addressJsonList,
+                    travelMode = "DRIVE",
+                    routingPreference = "TRAFFIC_AWARE_OPTIMAL",
+                    arrivalTime = pool.ArrivalTime,
+                    computeAlternativeRoutes = false,
+                    routeModifiers = new { vehicleInfo = new { emissionType = "GASOLINE" } },
+                    languageCode = "en-US",
+                    units = "IMPERIAL"
+                };
+
+                Console.Write(JsonConvert.SerializeObject(routeRequest));
+                //Console.Write("\n");
+
+                httpRequest.Content = new StringContent(
+                    JsonConvert.SerializeObject(routeRequest), Encoding.UTF8, "application/json");
+                httpRequest.Headers.Add("X-Goog-FieldMask",
+                    "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline,routes.legs.duration");
+                HttpResponseMessage response = await client.SendAsync(httpRequest);
+                Console.Write((await response.Content.ReadAsStringAsync()));
+                dynamic item = JsonConvert.DeserializeObject(await response.Content.ReadAsStringAsync());
+                // Generate Route
+                int duration = Int32.Parse(
+                    item.routes[0].duration.ToString().Remove(item.routes[0].duration.ToString().Length - 1)
+                    );
+
+                    savedResponse = response; ;
+                    minInt = duration;
+                    recordedI = 0;
+                    Console.WriteLine(2);
+            }
+            Console.Write(savedResponse.ToString());
+            dynamic newitem = JsonConvert.DeserializeObject(await savedResponse.Content.ReadAsStringAsync());
+            int newduration = Int32.Parse(
+                newitem.routes[0].duration.ToString().Remove(newitem.routes[0].duration.ToString().Length - 1)
+                );
+            Random random = new Random();
+            Routes newRoute = new Routes
+            {
+                RouteId = random.Next(10000000, 99999999),
+                Distance = newitem.routes[0].distanceMeters,
+                Duration = newduration,
+                Polylines = newitem.routes[0].polyline.encodedPolyline
+            };
+
+            addressList.Insert(recordedI, (await _context.Users.FindAsync(obj.MemId)).Address);
+
+            obj.RouteId = newRoute.RouteId;
+
+            int time = 0;
+            for (int i = 0;i < addressList.Count; i++)
+            {
+                if(i > recordedI)
+                {
+                    var k = newitem.routes[0].legs[i];
+                    time += Int32.Parse(k.duration.ToString().Remove(k.duration.ToString().Length - 1));
+                }
+
+                RouteOrder newOrder = new RouteOrder();
+                newOrder.RouteId = newRoute.RouteId;
+                newOrder.UserId =  _context.Users.Where(x => x.Address.Equals(addressList[i])).FirstOrDefault().UserId;
+                newOrder.Order = i;
+                _context.RouteOrder.Add(newOrder);
+                await _context.SaveChangesAsync();
+            }
+            DateTime dateTimeOffset = DateTime.Parse(pool.ArrivalTime, null, DateTimeStyles.RoundtripKind);
+            
+            obj.PickupTime = dateTimeOffset.AddSeconds(0-time).ToString(); 
+
+            _context.Routes.Add(newRoute);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetRequestJoin", new { id = requestJoin.PoolId }, requestJoin);
+            _context.RequestJoin.Add(obj);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetRequestJoin", new { id = obj.PoolId }, obj);
+        }
+
+        private async Task<String> getStartAddressFromPoolId(int poolId)
+        {
+            Pool pool = await _context.Pool.FindAsync(poolId);
+            User user = await _context.Users.FindAsync(pool.HostId);
+            return user.Address;
         }
 
         // DELETE: api/RequestJoins/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRequestJoin(int id)
+        // ACCEPT REQUEST 
+        [HttpDelete("AcceptRequest")]
+        public async Task<IActionResult> AcceptRequestJoin(RequestJoin requestJoin)
         {
-            var requestJoin = await _context.RequestJoin.FindAsync(id);
-            if (requestJoin == null)
+            var temp = _context.RequestJoin
+               .Where(x => x.PoolId == requestJoin.PoolId
+               && x.MemId == requestJoin.MemId).FirstOrDefault();
+
+            if (temp == null)
+            {
+                return NotFound();
+            }
+            _context.Passenger.Add(requestToPassenger(requestJoin));            // Add passenger
+            _context.JoinedPoll.Add(RequestPollToJoinedPoll(requestJoin));      // Add JoinedPoll
+            _context.RequestJoin.Remove(temp);
+            await _context.SaveChangesAsync();
+
+            // Update route in pool
+            UpdatePool(requestJoin);
+
+            return NoContent();
+        }
+
+        // DELETE: api/RequestJoins/5
+        // DELETE REQUEST OR REJECT
+        [HttpDelete("DeleteRequest")]
+        public async Task<IActionResult> DeleteRequestJoin(RequestJoin requestJoin)
+        {
+            var temp = _context.RequestJoin
+               .Where(x => x.PoolId == requestJoin.PoolId
+               && x.MemId == requestJoin.MemId).FirstOrDefault();
+            if (temp == null)
             {
                 return NotFound();
             }
 
-            _context.RequestJoin.Remove(requestJoin);
+            _context.RequestJoin.Remove(temp);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -103,6 +331,62 @@ namespace Backend.Controllers
         private bool RequestJoinExists(int id)
         {
             return _context.RequestJoin.Any(e => e.PoolId == id);
+        }
+
+        private RequestJoin dtoToRequest(RequestDTO dto)
+        {
+            RequestJoin obj = new RequestJoin
+            {
+                PoolId = dto.PoolId,
+                MemId = dto.MemId,
+                PickupTime = "",            // NEED ROUTE
+                RouteId = 0
+            };
+
+            return obj;
+        }
+
+        private Passenger requestToPassenger(RequestJoin request)
+        {
+            Passenger passenger = new Passenger
+            {
+                PoolId = request.PoolId,
+                PassengerId = request.MemId,
+                PickupTime = request.PickupTime
+            };
+
+            return passenger;
+        }
+
+        private JoinedPoll RequestPollToJoinedPoll(RequestJoin requestJoin)
+        {
+            JoinedPoll joined = new JoinedPoll
+            {
+                MemId = requestJoin.MemId,
+                PoolId = requestJoin.PoolId,
+                PickupTime = requestJoin.PickupTime,
+                RouteId = requestJoin.RouteId,
+            };
+
+            return joined;
+        }
+
+        private async void UpdatePool(RequestJoin request)
+        {
+            //int id = request.PoolId;
+            Pool pool = await _context.Pool.FindAsync(request.PoolId);
+
+            pool.RouteId = request.RouteId;
+
+            _context.Entry(pool).State = EntityState.Modified;
+
+            await _context.SaveChangesAsync();  
+
+        }
+
+        private bool PoolExists(int id)
+        {
+            return _context.Pool.Any(e => e.PoolId == id);
         }
     }
 }

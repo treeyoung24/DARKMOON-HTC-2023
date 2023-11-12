@@ -25,5 +25,45 @@ namespace Learning.Models
 
         public DbSet<Backend.Models.RequestJoin> RequestJoin { get; set; }
 
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<RequestJoin>()
+                .HasKey(rj => new { rj.PoolId, rj.MemId
+            });
+
+            modelBuilder.Entity<JoinedPoll>()
+                .HasKey(rj => new {
+                    rj.PoolId,
+                    rj.MemId
+                });
+
+            modelBuilder.Entity<RouteOrder>()
+                .HasKey(rj => new {
+                    rj.Order,
+                    rj.UserId,
+                    rj.RouteId
+                });
+
+            modelBuilder.Entity<Passenger>()
+                .HasKey(rj => new {
+                    rj.PoolId,
+                    rj.PassengerId,
+                });
+
+            modelBuilder.Entity<Driver>()
+                .HasKey(rj => new {
+                    rj.PoolId,
+                    rj.DriverId,
+                });
+
+        }
+
+
+
+        public DbSet<Backend.Models.JoinedPoll> JoinedPoll { get; set; }
+
+
     }
 }
