@@ -2,7 +2,6 @@ import { PoolDriverMyPoolDTO } from "../dtos/pool-driver-mypool.dto";
 import { PoolPassengerMyViewDTO } from "../dtos/pool-passenger-myview.dto";
 import { PoolDTO } from "../dtos/pool.dto";
 
-
 const rootUrl = 'https://localhost:7113/api/';
 
 export const ENDPOINTS = {
@@ -15,7 +14,7 @@ export const ENDPOINTS = {
 }
 
 const createApiRequestFunction = (method: string, endpointSuffix?: string) => {
-    return async (endpoint: string, data?: any): Promise<any> => {
+    return async ( data?: any): Promise<any> => {
         try {
             const requestOptions: RequestInit = {
                 method: method,
@@ -25,7 +24,7 @@ const createApiRequestFunction = (method: string, endpointSuffix?: string) => {
                 body: data ? JSON.stringify(data) : undefined,
             };
 
-            const response = await fetch(rootUrl + endpoint + endpointSuffix, requestOptions);
+            const response = await fetch(rootUrl + endpointSuffix, requestOptions);
 
             if (!response.ok) {
                 throw new Error(`Request failed. Status: ${response.status}`);
@@ -34,7 +33,7 @@ const createApiRequestFunction = (method: string, endpointSuffix?: string) => {
             const res = await response.json();
             return res;
         } catch (error) {
-            console.error(`Error making request to ${endpoint}:`, error);
+            console.error(`Error making request to ${endpointSuffix}:`, error);
             throw error; // Rethrow the error to be caught by the caller
         }
     };
@@ -45,6 +44,11 @@ const createApiRequestFunction = (method: string, endpointSuffix?: string) => {
 // export const postUser = createApiRequestFunction('POST')(ENDPOINTS.user);
 // export const getUser = createApiRequestFunction('GET')(ENDPOINTS.user);
 // export const postRoute = createApiRequestFunction('POST')(ENDPOINTS.route);
-export const postPool: (endpoint: string, pool: PoolDTO) => Promise<any> = createApiRequestFunction('POST');
-export const getMyPool: (endpoint: string, pool: PoolDriverMyPoolDTO) => Promise<any> = createApiRequestFunction('POST', 'GetDriverPools');
-export const getRequestPool: (endpoint: string, pool: PoolPassengerMyViewDTO) => Promise<any> = createApiRequestFunction('POST', 'GetPassengerPools');
+// Create Pool
+export const postPool: (pool: PoolDTO) => Promise<any> = createApiRequestFunction('POST');
+
+// Get My Pool - Driver
+export const getMyPool: (pool: PoolDriverMyPoolDTO) => Promise<any> = createApiRequestFunction('POST', ENDPOINTS.pool + 'GetDriverPools');
+
+
+export const getRequestPool: (pool: PoolPassengerMyViewDTO) => Promise<any> = createApiRequestFunction('POST', ENDPOINTS.pool + 'GetPassengerPools');

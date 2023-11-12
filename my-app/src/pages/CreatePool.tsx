@@ -31,7 +31,7 @@ export function CreatePool() {
             //     console.log("Success")
             // })
 
-            postPool(ENDPOINTS.pool, dto).then((res) => {
+            postPool(dto).then((res) => {
                 console.log(res);
                 console.log("Success");
             }).catch((error) => {
