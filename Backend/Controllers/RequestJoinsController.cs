@@ -37,17 +37,33 @@ namespace Backend.Controllers
         }
 
         // GET: api/RequestJoins/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<RequestJoin>> GetRequestJoin(int id)
+        [HttpGet("GetSingleRequest")]
+        public async Task<ActionResult<IEnumerable<RequestJoin>>> GetSingleRequest(int id, int MemId)
         {
-            var requestJoin = await _context.RequestJoin.FindAsync(id);
+            var temp = await _context.RequestJoin
+               .Where(x => x.PoolId == id && x.MemId == MemId).ToListAsync();
 
-            if (requestJoin == null)
+            if (temp == null)
             {
                 return NotFound();
             }
 
-            return requestJoin;
+            return temp;
+        }
+
+        // GET: api/RequestJoins/5
+        [HttpGet("GetPassengerRequest")]
+        public async Task<ActionResult<IEnumerable<RequestJoin>>> GetPassengerRequest(int MemId)
+        {
+            var temp = await _context.RequestJoin
+               .Where(x => x.MemId == MemId).ToListAsync();
+
+            if (temp == null)
+            {
+                return NotFound();
+            }
+
+            return temp;
         }
 
         // GET: api/RequestJoins/5
