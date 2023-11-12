@@ -32,7 +32,7 @@ namespace Backend.Controllers
 
         // GET: api/Pools/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Pool>> GetPool(int id)
+        public async Task<ActionResult<PoolReturnDTO>> GetPool(int id)
         {
             var pool = await _context.Pool.FindAsync(id);
 
@@ -41,7 +41,11 @@ namespace Backend.Controllers
                 return NotFound();
             }
 
-            return pool;
+            User user = await _context.Users.FindAsync(pool.HostId);
+            PoolReturnDTO dto = PoolToReturnAsync(pool);
+            dto.StartingPoint = user.Address;
+
+            return dto;
         }
 
         // GET: api/Pools/5
@@ -235,7 +239,20 @@ namespace Backend.Controllers
             return (obj, dr);
         }
 
-        
+        private PoolReturnDTO PoolToReturnAsync(Pool pool)
+        {
+            
+
+            PoolReturnDTO result = new PoolReturnDTO
+            {
+                PoolSize = pool.PoolSize,
+                ArrivalTime = pool.ArrivalTime,
+                Destination = pool.Destination,
+                StartingPoint = ""
+            };
+
+            return result;
+        }
 
     }
 
