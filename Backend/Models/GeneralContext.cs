@@ -25,5 +25,22 @@ namespace Learning.Models
 
         public DbSet<Backend.Models.RequestJoin> RequestJoin { get; set; }
 
+        //protected override void OnModelCreating(ModelBuilder modelBuilder)
+        //{
+        //    modelBuilder.Entity<User>().HasData(
+        //        new User
+        //        {
+        //UserId = 1,
+        //            Name = "William Shakespeare",
+        //            Email = "williamShakespeare@gmail.com",
+        //            Phone = "4031234567",
+        //            Address = "9 Avenue Southwest, Calgary, AB",
+        //            Gender = "male",
+        //            Age = 20
+        //        }
+        //    );
+        //}
+
+
     }
 }

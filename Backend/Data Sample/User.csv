@@ -1,0 +1,6 @@
+﻿UserId,Name,Email,Phone,Address,Gender,Age
+1,William Shakespeare,williamShakespeare@gmail.com,4031234567,"9 Avenue Southwest, Calgary, AB",Male,23
+2,John Carter,johnCarter@gmail.com,4031356778,"588 Aero Dr NE #106, Calgary, AB T2E 7Y4",Male,24
+3,Lily Potter,lilyPotter@gmail.com,4031356123,"140 15 Ave NW, Calgary, AB T2M 0G6",Female,25
+4,Ron Weasley,ronWeasley@gmail.com,4031356345,"5508 1 St SE #5, Calgary, AB T2H 2W9",Male,26
+5,Hailey Salmon,haileySalmon@gmail.com,4031356789,"7130 Fisher Rd SE Unit 6, Calgary, AB T2H 0W3",Female,27
