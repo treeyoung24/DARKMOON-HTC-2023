@@ -65,3 +65,9 @@ export const getMyPool: (id: number) => Promise<ReturnDTO<PoolDriverMyPoolDTORet
 
 export const getPassengerPool: (passId: number) => Promise<ReturnDTO<PassengerDTOReturn[]>> = createApiRequestFunction('GET', ENDPOINTS.pool + 'GetPassengerPools');
 export const getPoolDetail: (poolId: number) => Promise<ReturnDTO<PoolViewDTOReturn>> = createApiRequestFunction('GET', ENDPOINTS.pool);
+
+// Get all join request of a pool
+export const getRequestPool: (passId: number) => Promise<any> = createApiRequestFunction('GET', ENDPOINTS.requestJoin + 'GetPassengerRequest');
+
+// Get all pending requests of a pool
+export const getPendingRequests: (poolId: number) => Promise<any> = createApiRequestFunction('GET', ENDPOINTS.requestJoin + 'GetAllPendingRequest');
