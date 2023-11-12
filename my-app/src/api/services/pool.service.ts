@@ -1,3 +1,4 @@
+import { PoolDriverMyPoolDTO } from "../dtos/pool-driver-mypool.dto";
 import { PoolDTO } from "../dtos/pool.dto";
 
 
@@ -12,7 +13,7 @@ export const ENDPOINTS = {
     driver: 'Drivers/'
 }
 
-const createApiRequestFunction = (method: string) => {
+const createApiRequestFunction = (method: string, endpointSuffix?: string) => {
     return async (endpoint: string, data?: any): Promise<any> => {
         try {
             const requestOptions: RequestInit = {
@@ -23,7 +24,7 @@ const createApiRequestFunction = (method: string) => {
                 body: data ? JSON.stringify(data) : undefined,
             };
 
-            const response = await fetch(rootUrl + endpoint, requestOptions);
+            const response = await fetch(rootUrl + endpoint + endpointSuffix, requestOptions);
 
             if (!response.ok) {
                 throw new Error(`Request failed. Status: ${response.status}`);
@@ -44,4 +45,4 @@ const createApiRequestFunction = (method: string) => {
 // export const getUser = createApiRequestFunction('GET')(ENDPOINTS.user);
 // export const postRoute = createApiRequestFunction('POST')(ENDPOINTS.route);
 export const postPool: (endpoint: string, pool: PoolDTO) => Promise<any> = createApiRequestFunction('POST');
-
+export const getMyPool: (endpoint: string, pool: PoolDriverMyPoolDTO) => Promise<any> = createApiRequestFunction('POST', 'GetDriverPools');
