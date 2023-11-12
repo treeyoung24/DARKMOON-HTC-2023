@@ -14,7 +14,6 @@ const center = {
     lat: -3.745,
     lng: -38.523
 };
-const googleMapsAPIKey = "AIzaSyCOSGEkapfeB2E0aP3j9RgEdkwVx77hUaY";
 function App() {
     // const { isLoaded } = useJsApiLoader({
     //     id: 'google-map-script',
