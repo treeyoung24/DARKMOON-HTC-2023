@@ -8,6 +8,7 @@ import { ChangeEvent, useEffect } from "react";
 import { PoolDTO } from "../api/dtos/pool.dto";
 import { postPool } from "../api/services/pool.service";
 import React from "react";
+import { ENDPOINTS } from "../api/services/pool.service";
 import { FieldChangeHandlerContext } from "@mui/x-date-pickers/internals";
 
 export function CreatePool() {
@@ -25,11 +26,17 @@ export function CreatePool() {
                 arrivalTime: "2023-11-15T15:01:23.045123456Z",
             }
 
-            postPool(dto).then((res) => {
-                console.log(res);
-                console.log("Success")
-            })
+            // postPool(dto, ENDPOINTS.pool).then((res) => {
+            //     console.log(res);
+            //     console.log("Success")
+            // })
 
+            postPool(ENDPOINTS.pool, dto).then((res) => {
+                console.log(res);
+                console.log("Success");
+            }).catch((error) => {
+                console.error(error);
+            });
         }, [])
     return (
         <div className="home">
