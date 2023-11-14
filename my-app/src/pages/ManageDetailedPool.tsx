@@ -61,7 +61,7 @@ export function ManageDetailedPool() {
                             type="text"
                             className="input"
                             id="wifi-name"
-                            value={startingPoint}
+                            value="233 33 Avenue T3E1P4"
                         ></input>
                     </div>
 
@@ -71,7 +71,7 @@ export function ManageDetailedPool() {
                             type="text"
                             className="input"
                             id="text-input"
-                            value={destination}
+                            value="588 Aero Dr NE #106, Calgary, AB T2E 7Y4"
                         ></input>
                     </div>
                     <div className="my-4 mx-4 flex flex-col items-start md:mx-10">
@@ -80,7 +80,7 @@ export function ManageDetailedPool() {
                             type="text"
                             className="input"
                             id="text-input"
-                            value={poolSize}
+                            value={3}
                         ></input>
                     </div>
                     <div className="my-4 mx-4 flex flex-col items-start md:mx-10">

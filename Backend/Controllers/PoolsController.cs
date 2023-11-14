@@ -121,6 +121,32 @@ namespace Backend.Controllers
             return pools;
         }
 
+        [HttpGet("GetPoolByDestination")]
+        public async Task<ActionResult<IEnumerable<PoolPassengerMyView>>> GetPoolByDestination(string address)
+        {
+            var temp = await _context.Pool
+               .Where(x => x.Destination == address ).ToListAsync();
+
+            if (temp == null)
+            {
+                return NotFound();
+            }
+
+            List<PoolPassengerMyView> listPools = new List<PoolPassengerMyView>();
+
+            foreach (Pool p in temp)
+            {
+                PoolPassengerMyView dp = PoolToPassengerView(p);
+                var pass = await _context.Passenger.Where(x => x.PoolId == p.PoolId).ToListAsync();
+                dp.Stops = p.PoolSize - pass.Count();
+                
+                // START TIME TODO
+                listPools.Add(dp);
+            }
+
+            return listPools;
+        }
+
         // PUT: api/Pools/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]

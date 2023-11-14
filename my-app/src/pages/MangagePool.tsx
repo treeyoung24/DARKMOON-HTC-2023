@@ -14,7 +14,7 @@ export function ManagePool() {
     const [approvedPassengers, setApprovedPassengers] = React.useState<PoolPassengerMyViewDTOReturn[]>([]);
 
     React.useEffect(() => {
-        const promises = [getMyPool(1), getPassengerPool(2), getRequestPool(1)];
+        const promises = [getMyPool(2), getPassengerPool(2), getRequestPool(2)];
 
         Promise.all(promises).then(values => {
             console.log(values);

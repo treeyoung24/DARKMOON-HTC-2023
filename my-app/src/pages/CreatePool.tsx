@@ -11,18 +11,19 @@ import React from "react";
 import { ENDPOINTS } from "../api/services/pool.service";
 import { FieldChangeHandlerContext } from "@mui/x-date-pickers/internals";
 import { useNavigate } from "react-router-dom";
+// import { createAPIEndpoint, ENDPOINTS } from "../api/services/axios.service";
 
 export function CreatePool() {
     const [destination, setDestination] = React.useState<string>("588 Aero Dr NE #106, Calgary, AB T2E 7Y4");
-    const [poolSize, setPoolSize] = React.useState<number>(1);
-    const [arrivalTime, setArrivalTime] = React.useState<string>("2023-11-15T15:01:23.045123456Z");
+    const [poolSize, setPoolSize] = React.useState<number>(3);
+    const [arrivalTime, setArrivalTime] = React.useState<string>("2023-11-12T17:17:33Z");
     const [arrivalDate, setArrivalDate] = React.useState<string>("");
     const [hostId, setHostId] = React.useState<number>(1);
 
     const dto: PoolDTO = {
-        hostId: 1,
-        poolSize: 1,
-        destination: "588 Aero Dr NE #106, Calgary, AB T2E 7Y4",
+        hostId: 2,
+        poolSize: 3,
+        destination: "856 Campus Pl NW, Calgary, AB T2N 4V8",
         arrivalTime: "2023-11-15T15:01:23.045123456Z",
     }
     const navigate = useNavigate();

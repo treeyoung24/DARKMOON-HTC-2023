@@ -17,7 +17,8 @@ export const createAPIEndpoint = (endpoint: string) => {
     return {
         fetch: () => axios.get(url),
         fetchById: (id: number) => axios.get(url + id),
-        // post: newRecord => axios.post(url, newRecord),
+        post: (newItem: any) => axios.post(url, newItem),
+        getPoolByDestination: (address: string) => axios.get(address),
         // customizePost: (newRecord, path) => axios.post(url + path, newRecord),
         // log: info => axios.post(url + 'Login', info),
         // put: (id, updatedRecord) => axios.put(url + id, updatedRecord),
